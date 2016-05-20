@@ -19,3 +19,10 @@ This version is stripped down to bare minimum (All these elements have been remo
 Dependencies :
 - mavlink
 - libopencm3
+
+Make sure to initialise the mavlink submodule
+
+git clone https://github.com/MHageH/c_uart_interface.git
+cd c_uart_interface
+git submodule init
+git submodule update 
