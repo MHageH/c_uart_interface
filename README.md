@@ -1,4 +1,6 @@
 # C UART Interface
+
+[![Join the chat at https://gitter.im/MHageH/c_uart_interface](https://badges.gitter.im/MHageH/c_uart_interface.svg)](https://gitter.im/MHageH/c_uart_interface?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
 A heavy modification of the original c_uart_interface_example, works on ARM 
 Cortex-M4 STM32F4
 
