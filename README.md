@@ -17,11 +17,17 @@ removed):
 - parse commandline and Ctrl-C handeling functions
 - printfs
 
-
 Dependencies :
 - mavlink
 - libopencm3
 
+# Recent mods 
+- Support for PC (still not completed)
+- added a separate makefile
+- STM32F4 build can simulate movement using the internal acceleration sensor
+LIS3DSH
+- Separate header files for each architecture
+ 
 # Requirements
 - STM32F4-discovery (or others might be possible with code modification)
 - ARM development tools : toolchain, st-link
@@ -77,6 +83,9 @@ openjdk-7-jre clang-3.5 lldb-3.5
 - git submodule update --init --recursive
 
 # Setting up simulation and netcat bridges
+Warning : you need at openjdk-7-jdk or openjdk-6-jdk, otherwise, it jmavsim 
+won't work unless tweaked.
+
 The simulation is based on jMAVsim, which is being regularly updated. This 
 application is able to simulate the movement of a drone to a high extent.
 
@@ -148,6 +157,7 @@ a terminal:
 and hit enter, you'll see a NuttxShell prompt waiting.
 Tap in: 
 - commander arm
+
 You'll see the motors start spining.
 Connect the STM32F4-discovery to power now.
 
