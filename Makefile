@@ -1,37 +1,3 @@
-##########################################################################	
-#	
-# Porting to STM32F4-discovery done by : 
-# 			 Mohamed Hage Hassan, <mohamed.hagehassan@yahoo.com>
-#
-# Redistribution and use in source and binary forms, with or without
-# modification, are permitted provided that the following conditions
-# are met:
-#
-# 1. Redistributions of source code must retain the above copyright
-#    notice, this list of conditions and the following disclaimer.
-# 2. Redistributions in binary form must reproduce the above copyright
-#    notice, this list of conditions and the following disclaimer in
-#    the documentation and/or other materials provided with the
-#    distribution.
-# 3. Neither the name PX4 nor the names of its contributors may be
-#    used to endorse or promote products derived from this software
-#    without specific prior written permission.
-#
-# THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
-# "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT
-# LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-# FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE
-# COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
-# INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING,
-# BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS
-# OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
-# AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT
-# LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
-# ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
-# POSSIBILITY OF SUCH DAMAGE.
-#
-##########################################################################
-
 NAME=mavlink_control
 
 # Toolchain 
@@ -59,7 +25,7 @@ SPECIFIC_FLAGS = -MD -DSTM32F4
 LDSTM32F4 = linker/stm32f4-discovery.ld 
 
 # Linker object
-OBJS = $(NAME).o serial_port_stm32.o syscalls.o
+OBJS = $(NAME).o serial_port_stm32.o syscalls.o interface.o lis3dsh.o
 
 # Linker flags 
 LD_FLAGS= -Wl,--start-group $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -I$(MAVLIB) $(OBJS) \
@@ -72,7 +38,10 @@ $(NAME).bin: $(NAME).elf
 
 $(NAME).elf: git_submodule $(SRC)/$(NAME).cpp
 	$(CC) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/syscalls.c 
+	$(CC) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/lis3dsh.c 
+
 	$(CXX) -I$(MAVLIB) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/$(NAME).cpp
+	$(CXX) -I$(MAVLIB) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/interface.cpp
 	$(CXX) -I$(MAVLIB) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/serial_port_stm32.cpp
 	$(CXX) $(LD_FLAGS) $(LIBS) -o $(NAME).elf
 
@@ -89,6 +58,7 @@ graph: $(NAME).bin
 	mkdir Graphs
 	mv *.expand Graphs/
 	egypt Graphs/*.expand | dot -Tsvg -Grankdir=LR -o Graphs/$(NAME).svg
+	eog Graphs/$(NAME).svg
 
 clean:
 	 rm -rf *.o $(NAME).elf *.d Graphs/ *.expand
