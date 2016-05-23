@@ -16,13 +16,6 @@ int main(void){
 	autopilot_intialize();
 
 	#ifdef STM32F4
-
-	// setup GPIOs for SPI
-	gpio_setup();
-
-	// setup USART1
-	usart_setup();
-
 	// initialise LIS3DSH 
 	lis3dsh_init();
 

@@ -1,6 +1,6 @@
 #include "lis3dsh.h"
 
-void gpio_setup(void){
+void spi_setup(void){
 	rcc_periph_clock_enable(RCC_GPIOA);
 	/* set SPI pins as CLK, MOSI, MISO */
 	gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO5 | GPIO6 | GPIO7);
@@ -17,8 +17,7 @@ void gpio_setup(void){
 	gpio_set_output_options(GPIOE, GPIO_OTYPE_PP, GPIO_OSPEED_100MHZ, GPIO3);
 	/* set CS high */
 	gpio_set(GPIOE, GPIO3);
-	}
-void usart_setup(void){
+
 	// USART1 setup
 	rcc_periph_clock_enable (RCC_USART1);
 
@@ -39,8 +38,7 @@ void usart_setup(void){
   	//usart_enable_rx_interrupt (USART1);
   	// Finally enable the USART. 
   	usart_enable (USART1);
-	}
-void spi_setup(void){
+
 	/* Enable SPI1 clock. */
 	rcc_periph_clock_enable(RCC_SPI1);
 
