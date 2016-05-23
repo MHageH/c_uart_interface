@@ -45,6 +45,7 @@ void commands(void){
 	}
 void operation (float timer){
 	#ifndef STM32F4
+	    time_t end;
 	    time_t begin =  time(NULL);
 	#endif 
 
@@ -120,10 +121,20 @@ void operation (float timer){
 			*/
 			default : break;
 		}
+		#ifndef STM32F4
+			end =  time(NULL);
+		if ((end - begin) == timer){
+				Program_counter++;
+				end = 0;
+			}
+
+		#else 
+			
 		if (seconds == timer){
 			Program_counter++;
 			seconds = 0;
 		}
+		#endif
 		// OLD :: if (Program_counter == 0 || Program_counter == 6) { Program_counter = 1;}
 		if (Program_counter == 0 || Program_counter == 3) { Program_counter = 2;}
 	}
