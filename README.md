@@ -179,3 +179,15 @@ Connect the STM32F4-discovery now, then:
 - make flash
 
 It should work by now
+
+# Generate Graphs 
+To better understand the inner working of such application, as well as a
+fast way to start programming it, function call graphs can be automatically
+generated :
+
+- make graph
+
+Requirements :
+- Graphviz
+- egypt
+
