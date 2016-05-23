@@ -5,7 +5,7 @@ Cortex-M4 STM32F4
 The original c_uart_interface_example can be found here (maintained by Lorenz 
 Meier): https://github.com/mavlink/c_uart_interface_example
 
-This modification is in Alpha stage currently, but works fine.
+This modification is in Beta stage currently.
 
 This version is stripped down to bare minimum (all these elements have been 
 removed): 
@@ -15,7 +15,7 @@ removed):
 - All C++ classes 
 - try and catch mechanisms
 - parse commandline and Ctrl-C handeling functions
-- printfs
+- printfs (Only for STM32F4 version)
 
 Dependencies :
 - mavlink
