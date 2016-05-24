@@ -12,11 +12,13 @@ static int fd;
 // Initialisation
 void serial_start(void){
     printf("Open port : /dev/ttyUSB0 \n");
-    fd=open(RS232_DEVICE, O_RDWR | O_NOCTTY ); 
-    if (fd <0) {
-        perror(RS232_DEVICE); 
-        exit(-1); 
-    }
+    fd = open(RS232_DEVICE, O_RDWR | O_NOCTTY ); 
+    
+        if (fd <0) {
+            perror(RS232_DEVICE); 
+            exit(-1); 
+        }
+
     tcgetattr(fd,&oldtio); /* save current serial port settings */
     bzero(&newtio, sizeof(newtio)); /* clear struct for new port settings */
     newtio.c_cflag = BAUDRATE | CS8 | CLOCAL | CREAD;  /* _no_ CRTSCTS */
@@ -29,11 +31,6 @@ void serial_start(void){
     tcsetattr(fd,TCSANOW,&newtio);
   }
 
-void blink(int port, int pin){
-	//
-	printf("port%d:%d\n",port,pin);
-  }
-
 // Serial Read
 int serial_read_message(mavlink_message_t &message){
 
@@ -42,24 +39,24 @@ int serial_read_message(mavlink_message_t &message){
 	return msgReceived;
 	}
 int usart_recv_blocking(int i){ 
- char c;
- read(fd,&c,1);
- return(c);
+    char c;
+    read(fd,&c,1);
+    return(c);
   }
 
 // Serial write
 int serial_write_message(const mavlink_message_t &message){
- char buff[300];
- int bytesWritten;
- unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buff, &message);
+    char buff[300];
+    int bytesWritten;
+    unsigned len = mavlink_msg_to_send_buffer((uint8_t*)buff, &message);
 
  for (int i = 0; i < sizeof(buff); i++) {
      write(fd,&buff[i],1);
     }
 
-  len = 0;
-  bytesWritten = len;
-  return bytesWritten;
+    len = 0;
+    bytesWritten = len;
+    return bytesWritten;
   }
 
 // gettimeofday

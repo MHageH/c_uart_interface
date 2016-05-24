@@ -1,5 +1,8 @@
 NAME = mavlink_control
 
+# Flags
+CFLAGS = -fdump-rtl-expand
+
 # Sources
 SRC = src
 
@@ -18,12 +21,18 @@ $(NAME): git_submodule $(OBJS)
 	g++ $(OBJS) -o $(NAME) 
 
 $(NAME).o: $(SRC)/$(NAME).cpp
-	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/$(NAME).cpp 
-	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/interface.cpp
-	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/serial_port_pc.cpp
+	g++ $(CFLAGS) -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/$(NAME).cpp 
+	g++ $(CFLAGS) -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/interface.cpp
+	g++ $(CFLAGS) -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/serial_port_pc.cpp
 
 git_submodule:
 	git submodule update --init --recursive
 
+graph: $(NAME)
+	mkdir Graphs
+	mv *.expand Graphs/
+	egypt Graphs/*.expand | dot -Tsvg -Grankdir=LR -o Graphs/$(NAME).svg
+	eog Graphs/$(NAME).svg
+
 clean:
-	rm *.o $(NAME)
+	rm -rf *.o $(NAME) Graphs/ *.expand
