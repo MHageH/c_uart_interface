@@ -13,16 +13,13 @@ OBJS = $(NAME).o interface.o serial_port_pc.o
 
 all: $(NAME)
 
-$(NAME): git_submodule $(OBJS)
+$(NAME): $(OBJS)
 	g++ $(OBJS) -o $(NAME) 
 
 $(NAME).o: $(SRC)/$(NAME).cpp
 	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/$(NAME).cpp
 	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/interface.cpp
 	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/serial_port_pc.cpp
-
-git_submodule:
-	git submodule update --init --recursive
 
 clean:
 	rm *.o $(NAME)

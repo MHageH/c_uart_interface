@@ -36,7 +36,7 @@ all: $(NAME).bin
 $(NAME).bin: $(NAME).elf
 	$(OC) -Obinary $(NAME).elf $(NAME).bin
 
-$(NAME).elf: git_submodule $(SRC)/$(NAME).cpp
+$(NAME).elf: $(SRC)/$(NAME).cpp
 	$(CC) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/syscalls.c 
 	$(CC) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/lis3dsh.c 
 
@@ -50,9 +50,6 @@ $(NAME).elf: git_submodule $(SRC)/$(NAME).cpp
 flash: $(NAME).bin
 	#st-flash erase v2 0x8000000
 	st-flash write $(NAME).bin 0x8000000
-
-git_submodule:
-	git submodule update --init --recursive
 
 graph: $(NAME).bin
 	mkdir Graphs
