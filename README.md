@@ -35,6 +35,7 @@ LIS3DSH
 - Make timer_isr dependent functions more general (works with any value of the 
 prescaler)
 - Recombine general_read_messages () and read_messages()
+- Add disable_offboard_control () on exit failure
 - Add support for other boards
 - Employ correction algorithms based on external sensor input
  
