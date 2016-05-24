@@ -100,8 +100,9 @@ void read_messages(void){
 				{
 					#ifdef STM32F4
 					gpio_toggle(GPIOD, GPIO12);
+					#else 
+						printf("MAVLINK_MSG_ID_HEARTBEAT\n");
 					#endif
-					//printf("MAVLINK_MSG_ID_HEARTBEAT\n");
 					mavlink_msg_heartbeat_decode(&message, &(current_messages.heartbeat));
 					current_messages.time_stamps.heartbeat = get_time_usec();
 					this_timestamps.heartbeat = current_messages.time_stamps.heartbeat;	

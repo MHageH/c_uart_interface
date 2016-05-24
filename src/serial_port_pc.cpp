@@ -24,6 +24,7 @@ void serial_start(void){
     newtio.c_oflag = IGNPAR; //ONOCR|ONLRET|OLCUC;
     newtio.c_cc[VTIME]    = 0;     /* inter-character timer unused */
     newtio.c_cc[VMIN]     = 1;     /* blocking read until 1 character arrives */
+    printf("Succeeded\n");
     tcflush(fd, TCIFLUSH);
     tcsetattr(fd,TCSANOW,&newtio);
   }

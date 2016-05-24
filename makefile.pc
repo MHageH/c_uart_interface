@@ -9,6 +9,7 @@ INCLUDE = inc/
 # MAVLink library
 MAVLIB = mavlink/include/mavlink/v1.0/
 
+# Linker
 OBJS = $(NAME).o interface.o serial_port_pc.o
 
 all: $(NAME)
@@ -17,7 +18,7 @@ $(NAME): git_submodule $(OBJS)
 	g++ $(OBJS) -o $(NAME) 
 
 $(NAME).o: $(SRC)/$(NAME).cpp
-	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/$(NAME).cpp
+	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/$(NAME).cpp 
 	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/interface.cpp
 	g++ -I$(INCLUDE) -I$(MAVLIB) -c $(SRC)/serial_port_pc.cpp
 

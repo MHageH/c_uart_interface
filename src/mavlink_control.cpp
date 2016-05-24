@@ -90,18 +90,25 @@ void operation (float timer){
 
 	switch(Program_counter){
 			case 0 : 
+
 				enable_offboard_control();
 				//enable_offboard_control();
 				#ifdef STM32F4	
 					gpio_toggle(GPIOD, GPIO13); 
-				#endif 
+				#else 
+					printf("Offboard control Enabled \n");
+				#endif
 				break;
 			case 1 :
+					#ifndef STM32F4
+						printf("Set point 1 \n");
+					#endif
 					set__( 1 , 0, - 2.5, set_point); break;
 			case 2 :
 					#ifdef STM32F4
 						set__( 1 + value_mg_y/100 , value_mg_x/100, - 5, set_point); break; 
 					#else 
+						printf("Set point 2 \n");
 						set__( 5 , 0, - 5, set_point); break;
 					#endif
 			/* OLD  ::
