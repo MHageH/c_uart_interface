@@ -11,7 +11,7 @@ This version is stripped down to bare minimum (all these elements have been
 removed): 
 - pthreads (all thread dependent functions have been replaced)
 - read/write (replaced by usart receive and send functions)
-- serial port (replaced with USART interuption)
+- serial port (replaced with USART)
 - All C++ classes 
 - try and catch mechanisms
 - parse commandline and Ctrl-C handeling functions
@@ -21,12 +21,22 @@ Dependencies :
 - mavlink
 - libopencm3
 
-# Recent mods 
-- Support for PC (still not completed)
+## Recent mods 
+- Support for PC (works, needs developement)
 - added a separate makefile
 - STM32F4 build can simulate movement using the internal acceleration sensor
 LIS3DSH
-- Separate header files for each architecture
+- Separate source files for each architecture
+- Resolved a bug when using the latest mavlink(c_library)
+
+## TODO
+- asynchronous read()/write() mechanism using USART interrupts
+- Reduce timer prescaler
+- Make timer_isr dependent functions more general (works with any value of the 
+prescaler)
+- Recombine general_read_messages () and read_messages()
+- Add support for other boards
+- Employ correction algorithms based on external sensor input
  
 # Requirements
 - STM32F4-discovery (or others might be possible with code modification)
