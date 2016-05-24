@@ -7,6 +7,8 @@ Meier): https://github.com/mavlink/c_uart_interface_example
 
 This modification is in Alpha stage currently, but works fine.
 
+### Latest modifications on Beta branch
+
 This version is stripped down to bare minimum (all these elements have been 
 removed): 
 - pthreads (all thread dependent functions have been replaced)
