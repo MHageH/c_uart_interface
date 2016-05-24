@@ -94,7 +94,7 @@ openjdk-7-jre clang-3.5 lldb-3.5
 - git submodule update --init --recursive
 
 # Setting up simulation and netcat bridges
-Warning : you need at openjdk-7-jdk or openjdk-6-jdk, otherwise, it jmavsim 
+Warning : you need at openjdk-7-jdk or openjdk-6-jdk, otherwise, jmavsim 
 won't work unless tweaked.
 
 The simulation is based on jMAVsim, which is being regularly updated. This 
@@ -154,7 +154,7 @@ Usually the simulated drone will react and behave exactly as a real drone.
 WARNING : You need to configure the drone correctly with qgroundcontrol before 
 doing this, or it will NOT react.
 
-STILL BEING WORKED.
+## STILL BEING WORKED.
 
 Here, you don't need any netcat connection, just plug a serial port connection 
 from Telem 2 (on the pixhawk) to the GPIO Pins on the STM32F4-discovery (after 
@@ -181,8 +181,6 @@ Make sure to initialise the mavlink submodule
 
 - git clone https://github.com/MHageH/c_uart_interface.git
 - cd c_uart_interface
-- git submodule init
-- git submodule update 
 
 Connect the STM32F4-discovery now, then:
 
