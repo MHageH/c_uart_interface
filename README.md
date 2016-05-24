@@ -177,7 +177,6 @@ to enter the offboard control mode yourself :
 - commander mode offboard 
 
 # Testing the interface
-Make sure to initialise the mavlink submodule
 
 - git clone https://github.com/MHageH/c_uart_interface.git
 - cd c_uart_interface
