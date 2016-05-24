@@ -12,6 +12,11 @@ int Program_counter = 0;
 
 float seconds = 0;
 
+#ifndef STM32F4
+	time_t end;
+	time_t begin =  time(NULL);
+#endif
+
 int main(void){
 	autopilot_intialize();
 
@@ -37,11 +42,6 @@ void commands(void){
 		operation(3);
 	}
 void operation (float timer){
-	#ifndef STM32F4
-	    time_t end;
-	    time_t begin =  time(NULL);
-	#endif 
-
 	read_messages_helper();
 
 	global_read_messages();
@@ -108,7 +108,7 @@ void operation (float timer){
 					#ifdef STM32F4
 						set__( 1 + value_mg_y/100 , value_mg_x/100, - 5, set_point); break; 
 					#else 
-						printf("Set point 2 \n");
+						// printf("Set point 2 \n");
 						set__( 5 , 0, - 5, set_point); break;
 					#endif
 			/* OLD  ::
@@ -123,9 +123,11 @@ void operation (float timer){
 		}
 		#ifndef STM32F4
 			end =  time(NULL);
-		if ((end - begin) == timer){
+				//printf("Time lapse : %d \n", end - begin);
+		if ((end - begin) >= timer){
+				begin = time(NULL);
+				printf("Operation : %d \n", Program_counter);
 				Program_counter++;
-				end = 0;
 			}
 
 		#else 
