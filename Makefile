@@ -58,4 +58,4 @@ graph: $(NAME).bin
 	eog Graphs/$(NAME).svg
 
 clean:
-	 rm -rf *.o $(NAME).elf *.d Graphs/ *.expand
+	 rm -rf *.o $(NAME).elf *.d Graphs/ *.expand *.bin

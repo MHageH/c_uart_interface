@@ -6,6 +6,11 @@ uint8_t          msgReceived = false;
 volatile uint32_t ticks_sec = 0;
 extern volatile float seconds;
 
+#define N 300
+
+char buffer[N];
+int b_index = 0;
+
 // Initialisation
 void serial_start(void){
     //rcc_clock_setup_hse_3v3(&rcc_hse_8mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
@@ -32,7 +37,12 @@ void serial_start(void){
   	 usart_set_parity (USART3, USART_PARITY_NONE);
   	 usart_set_flow_control (USART3, USART_FLOWCONTROL_NONE);
   	 // Enable USART3 Receive interrupt. 
-  	 usart_disable_rx_interrupt (USART3);
+
+  	 // OLD :: 
+  	 // usart_disable_rx_interrupt (USART3);
+
+	 usart_enable_rx_interrupt (USART3);  	 
+
   	 // Finally enable the USART. 
   	 usart_enable (USART3);
 
@@ -69,6 +79,22 @@ void usart1_isr (void){
 	//
 	}
 void usart3_isr(void){
+		static uint8_t data;
+		
+		if (((USART_CR1(USART3) & USART_CR1_RXNEIE) != 0) 
+		 && ((USART_SR(USART3) & USART_SR_RXNE) != 0)) {
+
+			gpio_toggle(GPIOD, GPIO12);
+
+			if (b_index == N) b_index = 0; 
+
+			data = usart_recv(USART3);
+
+			//if (data != 0){
+			buffer[b_index] = data;
+			b_index++;
+			//}
+	}
 	//
 	}
 void tim2_isr (void) { 
@@ -83,9 +109,35 @@ void tim2_isr (void) {
 // Serial Read
 int serial_read_message(mavlink_message_t &message){
 
-   	msgReceived = mavlink_parse_char(MAVLINK_COMM_1, usart_recv_blocking(USART3), &message, &status);
+	//gpio_toggle(GPIOD, GPIO13);
+	if(b_index != 0){
 
+	int b_start = 0;
+	int b_end = b_index;
+
+	char b_tmp[N];
+
+	for (int i = 0; i < b_end; i++){
+		b_tmp[i] = buffer[i]; 
+	} 
+
+	gpio_toggle(GPIOD, GPIO13);
+
+	// OLD :: 
+   	// msgReceived = mavlink_parse_char(MAVLINK_COMM_1, usart_recv_blocking(USART3), &message, &status);
+
+	// if(b_end != 0){
+		//while ( (b_start < b_end) && (msgReceived == 0)){
+		do {
+			gpio_toggle(GPIOD, GPIO15);
+			msgReceived = mavlink_parse_char(MAVLINK_COMM_1, b_tmp[b_start], &message, &status);
+			b_start++;
+			if (msgReceived) gpio_toggle(GPIOD, GPIO14);
+			//if (b_start == b_end) break;
+			} while ( (b_start < b_end) && (msgReceived == 0));
+	//	}
 	return msgReceived;
+		}
 	}
 
 // Serial write

@@ -26,7 +26,7 @@ _ssize_t _read(struct _reent *r, int file, void *ptr, size_t len){
 	
 	p = (unsigned char*)ptr;
 	
-	for (i = 0; i < len; i++) {c=usart_recv_blocking(USART3);*p++ = c;} // Since we are using USART3
+	//for (i = 0; i < len; i++) {c=usart_recv_blocking(USART3);*p++ = c;} // Since we are using USART3
 	return len - i;
 }
 
