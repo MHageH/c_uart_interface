@@ -172,8 +172,6 @@ Make sure to initialise the mavlink submodule
 
 - git clone https://github.com/MHageH/c_uart_interface.git
 - cd c_uart_interface
-- git submodule init
-- git submodule update 
 
 Connect the STM32F4-discovery now, then:
 
@@ -181,3 +179,11 @@ Connect the STM32F4-discovery now, then:
 - make flash
 
 It should work by now
+
+## Testing Beta 
+- git clone https://github.com/MHageH/c_uart_interface.git
+- cd c_uart_interface
+- git checkout Beta
+- git pull origin Beta
+
+
