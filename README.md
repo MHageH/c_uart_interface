@@ -57,9 +57,11 @@ This version have latest gcc and libopencm3 configured for installation.
 Install the dependencies :
 apt-get install libmpc-dev libgmp-dev libmpfr-dev
 
-- git clone https://github.com/jmfriedt/summon-arm-toolchain
-- chmod +x summon-arm-toolchain 
-- ./summon-arm-toolchain
+```
+ git clone https://github.com/jmfriedt/summon-arm-toolchain
+ chmod +x summon-arm-toolchain 
+ ./summon-arm-toolchain
+```
 
 Define the path to the binaries after the installation is finished :
 export PATH=/home/<USERNAME>/sat/bin:$PATH
