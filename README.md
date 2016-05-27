@@ -151,6 +151,37 @@ then (1)
 
 Usually the simulated drone will react and behave exactly as a real drone.
 
+# Testing the PC version on a virtual drone
+## Better connection without FTDI Cables
+This will test the the PC version of the program without any cables, on the
+virtual drone.
+
+Open 3 terminals :
+type : 
+- nc -l -u -p 14540 127.0.0.1 | tee /dev/pts/(n+1) > /dev/null (In the (1) 
+terminal)
+- socat -d -d pty,raw,echo=0 pty,raw,echo=0 (In the (2) terminal)
+- cat < /dev/pts/(n+1) | nc -u 127.0.0.1 14556 (In the (3) terminal)
+
+Execute these in the following order : (2) (3) (1)
+Usualy, when you execute the (2) command, socat will open 2 virtual ports :
+ex : 
+
+- 2016/05/27 17:44:53 socat[24892] N PTY is /dev/pts/12
+- 2016/05/27 17:44:53 socat[24892] N PTY is /dev/pts/13
+- 2016/05/27 17:44:53 socat[24892] N starting data transfer loop with FDs[3,3] 
+and [5,5]
+
+Here, n = 12, n+1 = 13
+
+Things to change before launching the main program :
+- in inc/serial_port.h , change #define RS232_DEVICE to "/dev/pts/n"
+
+Then compile and execute :
+- make -f makefile.pc
+- ./mavlink_control
+
+
 # Testing on a real drone :
 WARNING : You need to configure the drone correctly with qgroundcontrol before 
 doing this, or it will NOT react.
