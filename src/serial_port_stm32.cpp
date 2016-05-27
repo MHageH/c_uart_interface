@@ -85,7 +85,7 @@ void usart1_isr (void){
 	//
 	}
 void usart3_isr(void){
-		static uint8_t data;
+	static uint8_t data;
 		
 		if (((USART_CR1(USART3) & USART_CR1_RXNEIE) != 0) 
 		 && ((USART_SR(USART3) & USART_SR_RXNE) != 0)) {
@@ -98,8 +98,7 @@ void usart3_isr(void){
 
 			buffer[b_index] = data;
 			b_index++;
-	}
-	//
+		}
 	}
 void tim2_isr (void) { 
 	ticks_sec++;
@@ -114,35 +113,6 @@ void tim2_isr (void) {
 
 // Serial Read
 int serial_read_message(mavlink_message_t &message){
-
-	//gpio_toggle(GPIOD, GPIO13);
-	//if(b_index != 0){
-
-	/*
-	int b_start = 0;
-
-	int b_end = b_index;
-
-	for (int i = 0; i < b_end; i++){
-		b_tmp[i] = buffer[i]; 
-	} 
-
-	gpio_toggle(GPIOD, GPIO13);
-	*/
-
-	// OLD :: 
-   	// msgReceived = mavlink_parse_char(MAVLINK_COMM_1, usart_recv_blocking(USART3), &message, &status);
-	/*
-		do {
-			gpio_toggle(GPIOD, GPIO15);
-			msgReceived = mavlink_parse_char(MAVLINK_COMM_1, b_tmp[b_start], &message, &status);
-			b_start++;
-			if (msgReceived) gpio_toggle(GPIOD, GPIO14);
-			//if (b_start == b_end) break;
-			} while ( (b_start < b_end) && (msgReceived == 0));
-	//}
-	*/
-
 		msgReceived = mavlink_parse_char (MAVLINK_COMM_1, buffer[mavlink_index], &message, &status);
 
 		if (mavlink_index < b_index){
@@ -153,9 +123,7 @@ int serial_read_message(mavlink_message_t &message){
 
 		if(mavlink_index == N) mavlink_index = 0;
 
-		// if (msgReceived) gpio_toggle(GPIOD, GPIO14);
-
-	return msgReceived;
+		return msgReceived;
 		}
 
 // Serial write

@@ -29,12 +29,12 @@ LIS3DSH (joystick like behavior)
 - Separate source files for each architecture
 - Fixed mavlink library
 - asynchronous read() mechanism using USART interrupts
+- Recombine general_read_messages () and read_messages()
 
 ## TODO
 - Reduce timer prescaler
 - Make timer_isr dependent functions more general (works with any value of the 
 prescaler)
-- Recombine general_read_messages () and read_messages()
 - Add intial position acquisation
 - Add disable_offboard_control () on exit failure
 - Employ correction algorithms based on external sensor input

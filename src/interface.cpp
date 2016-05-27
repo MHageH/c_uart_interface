@@ -10,9 +10,8 @@ bool time_to_exit;
 Mavlink_Messages current_messages;
 mavlink_set_position_target_local_ned_t current_setpoint;
 
-// MOD :: asynchronous
- float highres_flag = 1;
-//
+float highres_flag = 1;
+int lock_read_messages = 0;
 
 // Initialisation
 
@@ -79,153 +78,6 @@ void autopilot_start(void){
 
 // READ
 void read_messages(void){
-	bool success;               // receive success flag
-	bool received_all = false;  // receive only one message
-	Time_Stamps this_timestamps;
-
-	// Blocking wait for new data
-	while ( !received_all ){ // and !time_to_exit
-		//   READ MESSAGE
-		mavlink_message_t message;
-
-		success = serial_read_message(message);
-
-		//   HANDLE MESSAGE
-		if( success ){
-			// Store message sysid and compid.
-			// Note this doesn't handle multiple message sources.
-			current_messages.sysid  = message.sysid;
-			current_messages.compid = message.compid;
-
-
-			// Handle Message ID
-			switch (message.msgid){
-				case MAVLINK_MSG_ID_HEARTBEAT:
-				{
-					#ifdef STM32F4
-					gpio_toggle(GPIOD, GPIO12);
-					#else 
-						printf("MAVLINK_MSG_ID_HEARTBEAT\n");
-					#endif
-					mavlink_msg_heartbeat_decode(&message, &(current_messages.heartbeat));
-					current_messages.time_stamps.heartbeat = get_time_usec();
-					this_timestamps.heartbeat = current_messages.time_stamps.heartbeat;	
-					break;
-				}
-
-				case MAVLINK_MSG_ID_SYS_STATUS:
-				{
-					//printf("MAVLINK_MSG_ID_SYS_STATUS\n");
-					mavlink_msg_sys_status_decode(&message, &(current_messages.sys_status));
-					current_messages.time_stamps.sys_status = get_time_usec();
-					this_timestamps.sys_status = current_messages.time_stamps.sys_status;
-					break;
-				}
-
-				case MAVLINK_MSG_ID_BATTERY_STATUS:
-				{
-					//printf("MAVLINK_MSG_ID_BATTERY_STATUS\n");
-					mavlink_msg_battery_status_decode(&message, &(current_messages.battery_status));
-					current_messages.time_stamps.battery_status = get_time_usec();
-					this_timestamps.battery_status = current_messages.time_stamps.battery_status;
-					break;
-				}
-
-				case MAVLINK_MSG_ID_RADIO_STATUS:
-				{
-					//printf("MAVLINK_MSG_ID_RADIO_STATUS\n");
-					mavlink_msg_radio_status_decode(&message, &(current_messages.radio_status));
-
-					current_messages.time_stamps.radio_status = get_time_usec();
-					this_timestamps.radio_status = current_messages.time_stamps.radio_status;
-					break;
-				}
-
-				case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
-				{
-					#ifdef STM32F4				
-						gpio_toggle(GPIOD, GPIO14);
-					#endif
-					//printf("MAVLINK_MSG_ID_LOCAL_POSITION_NED\n");
-					mavlink_msg_local_position_ned_decode(&message, &(current_messages.local_position_ned));
-					current_messages.time_stamps.local_position_ned = get_time_usec();
-					this_timestamps.local_position_ned = current_messages.time_stamps.local_position_ned;
-					break;
-				}
-
-				case MAVLINK_MSG_ID_GLOBAL_POSITION_INT:
-				{
-					//printf("MAVLINK_MSG_ID_GLOBAL_POSITION_INT\n");
-					mavlink_msg_global_position_int_decode(&message, &(current_messages.global_position_int));
-					current_messages.time_stamps.global_position_int = get_time_usec();
-					this_timestamps.global_position_int = current_messages.time_stamps.global_position_int;
-					break;
-				}
-
-				case MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED:
-				{
-					//printf("MAVLINK_MSG_ID_POSITION_TARGET_LOCAL_NED\n");
-					mavlink_msg_position_target_local_ned_decode(&message, &(current_messages.position_target_local_ned));
-					current_messages.time_stamps.position_target_local_ned = get_time_usec();
-					this_timestamps.position_target_local_ned = current_messages.time_stamps.position_target_local_ned;
-					break;
-				}
-
-				case MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT:
-				{
-					//printf("MAVLINK_MSG_ID_POSITION_TARGET_GLOBAL_INT\n");
-					mavlink_msg_position_target_global_int_decode(&message, &(current_messages.position_target_global_int));
-					current_messages.time_stamps.position_target_global_int = get_time_usec();
-					this_timestamps.position_target_global_int = current_messages.time_stamps.position_target_global_int;
-					break;
-				}
-
-				case MAVLINK_MSG_ID_HIGHRES_IMU:
-				{
-					//printf("MAVLINK_MSG_ID_HIGHRES_IMU\n");
-					mavlink_msg_highres_imu_decode(&message, &(current_messages.highres_imu));
-					current_messages.time_stamps.highres_imu = get_time_usec();
-					this_timestamps.highres_imu = current_messages.time_stamps.highres_imu;
-					break;
-				}
-
-				case MAVLINK_MSG_ID_ATTITUDE:
-				{
-					//printf("MAVLINK_MSG_ID_ATTITUDE\n");
-					mavlink_msg_attitude_decode(&message, &(current_messages.attitude));
-					current_messages.time_stamps.attitude = get_time_usec();
-					this_timestamps.attitude = current_messages.time_stamps.attitude;
-					break;
-				}
-
-				default:
-				{
-					// printf("Warning, did not handle message id %i\n",message.msgid);
-					break;
-				} // MAVLINK_MESSAGES
-			} // end: switch msgid
-		} // end: if read message
-
-		// Check for receipt of all items
-		received_all =
-				this_timestamps.heartbeat                  &&
-		//				this_timestamps.battery_status             &&
-		//				this_timestamps.radio_status               &&
-						this_timestamps.local_position_ned         
-		//				this_timestamps.global_position_int        &&
-		//				this_timestamps.position_target_local_ned  &&
-		//				this_timestamps.position_target_global_int &&
-		//				this_timestamps.highres_imu                &&
-		//				this_timestamps.attitude                   &&
-			// :: MOD : disabled for fast debugging
-			//	this_timestamps.sys_status
-				;		
-	} // end: while not received all
-
-	
-	return;
-	}
-void global_read_messages(void){
 	bool success;               // receive success flag
 	bool received_all = false;  // receive only one message
 	Time_Stamps this_timestamps;
@@ -304,7 +156,7 @@ void global_read_messages(void){
 					}
 
 				case MAVLINK_MSG_ID_HIGHRES_IMU: {
-					gpio_toggle(GPIOD, GPIO13);
+					//gpio_toggle(GPIOD, GPIO13);
 					mavlink_msg_highres_imu_decode(&message, &(current_messages.highres_imu));
 					current_messages.time_stamps.highres_imu = get_time_usec();
 					this_timestamps.highres_imu = current_messages.time_stamps.highres_imu;
@@ -323,14 +175,30 @@ void global_read_messages(void){
 			} // end: switch msgid
 		} // end: if read message
 
-		received_all = this_timestamps.highres_imu;	
-
-		if (highres_flag == 0) break;
+		if (lock_read_messages == 0){
+			// Check for receipt of all items
+			received_all =
+					this_timestamps.heartbeat                  &&
+			//				this_timestamps.battery_status             &&
+			//				this_timestamps.radio_status               &&
+							this_timestamps.local_position_ned         
+			//				this_timestamps.global_position_int        &&
+			//				this_timestamps.position_target_local_ned  &&
+			//				this_timestamps.position_target_global_int &&
+			//				this_timestamps.highres_imu                &&
+			//				this_timestamps.attitude                   &&
+				// :: MOD : disabled for fast debugging
+				//	this_timestamps.sys_status
+						;		
+			} else {
+				received_all = this_timestamps.highres_imu;	
+				if (highres_flag == 0) break;
+			}
 
 		} 
+		lock_read_messages = 1;		
 	return;
 	}
-//
 
 // Write
 void autopilot_write(void){
@@ -448,13 +316,15 @@ void set_position(float x, float y, float z, mavlink_set_position_target_local_n
 	
 	}
 void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &final_set_point){
-				set_position( x , y  , z, final_set_point);
-				autopilot_update_setpoint(final_set_point);
-				autopilot_write_setpoint();
-				#ifdef STM32F4
-				gpio_toggle(GPIOD, GPIO13);
-				#endif
-					}
+		set_position( x , y  , z, final_set_point);
+		autopilot_update_setpoint(final_set_point);
+		autopilot_write_setpoint();
+
+		#ifdef STM32F4
+			gpio_toggle(GPIOD, GPIO13);
+		#endif
+
+		}
 
 uint64_t get_time_usec(void){
 	static struct timeval _time_stamp;

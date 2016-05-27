@@ -5,7 +5,7 @@ mavlink_set_position_target_local_ned_t initial_position;
 int value_mg_x, value_mg_y, value_mg_z;
 
 // Scheduler related
-int lock_read_messages = 0;
+//int lock_read_messages = 0;
 bool lock_ = false;
 
 int Program_counter = 0; 
@@ -42,9 +42,7 @@ void commands(void){
 		operation(3);
 	}
 void operation (float timer){
-	read_messages_helper();
-
-	global_read_messages();
+	read_messages();
 	autopilot_write_helper();
 
 	mavlink_set_position_target_local_ned_t set_point;
@@ -142,12 +140,6 @@ void operation (float timer){
 	}
 
 // Function Helpers
-void read_messages_helper(void){
-	if(lock_read_messages == 0){
-			read_messages();
-	}
-	lock_read_messages = 1;
-	}
 void autopilot_write_helper(void){
 	if (lock_ == false) {
 			autopilot_write();		

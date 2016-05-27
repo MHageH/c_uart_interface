@@ -93,7 +93,7 @@ void autopilot_intialize(void);
 void autopilot_start(void);
 
 //	READ 
-void global_read_messages(void);
+//void global_read_messages(void);
 void read_messages(void);
 
 // Write
