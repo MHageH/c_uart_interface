@@ -22,22 +22,23 @@ Dependencies :
 - libopencm3
 
 ## Recent mods 
-- Support for PC (works, needs developement)
+- Support for PC
 - added a separate makefile
 - STM32F4 build can simulate movement using the internal acceleration sensor
-LIS3DSH
+LIS3DSH (joystick like behavior)
 - Separate source files for each architecture
-- Resolved a bug when using the latest mavlink(c_library)
+- Fixed mavlink library
+- asynchronous read() mechanism using USART interrupts
 
 ## TODO
-- asynchronous read()/write() mechanism using USART interrupts
 - Reduce timer prescaler
 - Make timer_isr dependent functions more general (works with any value of the 
 prescaler)
 - Recombine general_read_messages () and read_messages()
+- Add 
 - Add disable_offboard_control () on exit failure
-- Add support for other boards
 - Employ correction algorithms based on external sensor input
+- Add support for other boards
  
 # Requirements
 - STM32F4-discovery (or others might be possible with code modification)
@@ -180,6 +181,10 @@ to enter the offboard control mode yourself :
 
 - git clone https://github.com/MHageH/c_uart_interface.git
 - cd c_uart_interface
+
+# Testing the last modifications and Beta version 
+- git checkout Beta
+- git pull origin Beta
 
 Connect the STM32F4-discovery now, then:
 
