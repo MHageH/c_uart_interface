@@ -22,23 +22,23 @@ Dependencies :
 - libopencm3
 
 ## Recent mods 
-[x] Support for PC
-[x] added a separate makefile
-[x] STM32F4 build can simulate movement using the internal acceleration sensor
-LIS3DSH (joystick like behavior)
-[x] Separate source files for each architecture
-[x] Fixed mavlink library
-[x] asynchronous read() mechanism using USART interrupts
-[x] Recombine general_read_messages () and read_messages()
+- Support for PC
+- added a separate makefile
+- STM32F4 build can simulate movement using the internal acceleration sensor
+LIS3DSH (joystick like behavior) 
+- Separate source files for each architecture
+Fixed mavlink library
+- asynchronous read() mechanism using USART interrupts
+- Recombine general_read_messages () and read_messages()
 
 ## TODO
-[ ] Reduce timer prescaler
-[ ] Make timer_isr dependent functions more general (works with any value of the 
+- Reduce timer prescaler
+- Make timer_isr dependent functions more general (works with any value of the 
 prescaler)
-[ ] Add intial position acquisation
-[ ] Add disable_offboard_control () on exit failure
-[ ] Employ correction algorithms based on external sensor input
-[ ] Add support for other boards
+- Add intial position acquisation
+- Add disable_offboard_control () on exit failure
+- Employ correction algorithms based on external sensor input
+- Add support for other boards
  
 # Requirements
 - STM32F4-discovery (or others might be possible with code modification)
