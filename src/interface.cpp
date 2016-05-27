@@ -140,7 +140,7 @@ void read_messages(void){
 				case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
 				{
 					#ifdef STM32F4				
-					gpio_toggle(GPIOD, GPIO14);
+					// gpio_toggle(GPIOD, GPIO14);
 					#endif
 					//printf("MAVLINK_MSG_ID_LOCAL_POSITION_NED\n");
 					mavlink_msg_local_position_ned_decode(&message, &(current_messages.local_position_ned));
@@ -268,7 +268,7 @@ void global_read_messages(void){
 
 				case MAVLINK_MSG_ID_LOCAL_POSITION_NED:{
 					#ifdef STM32F4
-					gpio_toggle(GPIOD, GPIO14);
+					// gpio_toggle(GPIOD, GPIO14);
 					#endif
 					mavlink_msg_local_position_ned_decode(&message, &(current_messages.local_position_ned));
 					current_messages.time_stamps.local_position_ned = get_time_usec();
@@ -455,7 +455,7 @@ void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &f
 				autopilot_update_setpoint(final_set_point);
 				autopilot_write_setpoint();
 				#ifdef STM32F4
-				gpio_toggle(GPIOD, GPIO13);
+				//gpio_toggle(GPIOD, GPIO13);
 				#endif
 					}
 

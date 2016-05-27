@@ -94,7 +94,7 @@ void operation (float timer){
 				enable_offboard_control();
 				//enable_offboard_control();
 				#ifdef STM32F4	
-					gpio_toggle(GPIOD, GPIO13); 
+					//gpio_toggle(GPIOD, GPIO13); 
 				#else 
 					printf("Offboard control Enabled \n");
 				#endif
