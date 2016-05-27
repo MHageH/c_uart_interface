@@ -3,7 +3,7 @@ A heavy modification of the original c_uart_interface_example, works on ARM
 Cortex-M4 STM32F4
 
 The original c_uart_interface_example can be found here (maintained by Lorenz 
-Meier): https://github.com/mavlink/c_uart_interface_example
+Meier): [mavlink_control](https://github.com/mavlink/c_uart_interface_example)
 
 This modification is in Beta stage currently.
 
@@ -25,9 +25,9 @@ Dependencies :
 - Support for PC
 - added a separate makefile
 - STM32F4 build can simulate movement using the internal acceleration sensor
-LIS3DSH (joystick like behavior)
+LIS3DSH (joystick like behavior) 
 - Separate source files for each architecture
-- Fixed mavlink library
+Fixed mavlink library
 - asynchronous read() mechanism using USART interrupts
 - Recombine general_read_messages () and read_messages()
 
@@ -55,7 +55,9 @@ https://github.com/jmfriedt/summon-arm-toolchain
 This version have latest gcc and libopencm3 configured for installation.
 
 Install the dependencies :
+```
 apt-get install libmpc-dev libgmp-dev libmpfr-dev
+```
 
 ```
  git clone https://github.com/jmfriedt/summon-arm-toolchain
@@ -64,15 +66,16 @@ apt-get install libmpc-dev libgmp-dev libmpfr-dev
 ```
 
 Define the path to the binaries after the installation is finished :
+```
 export PATH=/home/<USERNAME>/sat/bin:$PATH
+```
 
 You can put this file in .bashrc or .profile to make bash add the path 
 each time.
 
 # Setup st-link
 Once the toolchain is installed to ~/sat or any other directory you choose, 
-proceed to install texane st-link:
-https://github.com/texane/stlink 
+proceed to install texane [ST-Link](https://github.com/texane/stlink)
 
 Instruction on the installation are available in the README.md file.
 
@@ -80,21 +83,27 @@ Instruction on the installation are available in the README.md file.
 Keep in mind that this piece of code (although not complete) interacts mainly 
 with PX4 autopilot system.
 
-Everything discussed here can be found on http://dev.px4.io/:
+Everything discussed here can be found on [Dev Guide](http://dev.px4.io/):
 
+```
 apt-get install python-serial openocd flex bison libncurses5-dev autoconf
 texinfo build-essential libftdi-dev libtool zlib1g-dev python-empy
+```
 
 # Simulation dependencies :
+```
 apt-get install ant protobuf-compiler libeigen3-dev libopencv-dev openjdk-7-jdk
 openjdk-7-jre clang-3.5 lldb-3.5
+```
 
 # Getting PX4 Firmware 
-- mkdir -p ~/src
-- cd ~/src
-- git clone https://github.com/PX4/Firmware.git
-- cd Firmware
-- git submodule update --init --recursive
+```
+  mkdir -p ~/src
+  cd ~/src
+  git clone https://github.com/PX4/Firmware.git
+  cd Firmware
+  git submodule update --init --recursive
+```
 
 # Setting up simulation and netcat bridges
 Warning : you need at openjdk-7-jdk or openjdk-6-jdk, otherwise, jmavsim 
@@ -104,7 +113,9 @@ The simulation is based on jMAVsim, which is being regularly updated. This
 application is able to simulate the movement of a drone to a high extent.
 
 First of all: check if the ttyUSB* device is present :
-- watch -n 1 “ dmesg | tail – 20” 
+```
+ watch -n 1 “ dmesg | tail – 20” 
+```
 
 Then setup a physical connection from the converter to the serial port :
 
@@ -124,24 +135,33 @@ the jMAVsim launching script to make it pass through a serial connection)
 
 Establish a netcat bridge (bit unreliable):
 Open 2 terminals, in the first (1) type: 
-- nc -l -u -p 14540 127.0.0.1 | cat > /dev/ttyUSB0 
+```
+  nc -l -u -p 14540 127.0.0.1 | cat > /dev/ttyUSB0 
+```
 In the second (2):
-- cat < /dev/ttyUSB0 | nc -u 127.0.0.1 14556
+```
+  cat < /dev/ttyUSB0 | nc -u 127.0.0.1 14556
+```
 
 Do not execute these yet, as you will need to compile and lunch the 
 simualation first :
 Open a third terminal and go to the PX4 source code
-- cd ~/src/Firmware 
-- make -j(#number_of_computer_cores) posix_sitl_default jmavsim
+```
+  cd ~/src/Firmware 
+  make -j(#number_of_computer_cores) posix_sitl_default jmavsim
+```
 
 If compiled succefully, a NuttxShell must spawn:
-- commander arm
-- commander disarm
+```
+  commander arm
+  commander disarm
+```
 
 Repeat untill you recieve the current home position, then :
-- param show SYS_COMPANION
-- param set SYS_COMPANION 57600 
-
+```
+  param show SYS_COMPANION
+  param set SYS_COMPANION 57600 
+```
 to correctly set the baud rate.
 
 The simulated drone is ready now to recieve commands.
@@ -159,30 +179,43 @@ This will test the the PC version of the program without any cables, on the
 virtual drone.
 
 Open 3 terminals :
-type : 
-- nc -l -u -p 14540 127.0.0.1 | tee /dev/pts/(n+1) > /dev/null (In the (1) 
-terminal)
-- socat -d -d pty,raw,echo=0 pty,raw,echo=0 (In the (2) terminal)
-- cat < /dev/pts/(n+1) | nc -u 127.0.0.1 14556 (In the (3) terminal)
+Type : 
+
+In the (1)st terminal :
+
+```
+  nc -l -u -p 14540 127.0.0.1 | tee /dev/pts/(n+1) > /dev/null 
+```
+In the (2)nd terminal :
+```
+  socat -d -d pty,raw,echo=0 pty,raw,echo=0 
+```
+In the (3)rd terminal :
+```
+  cat < /dev/pts/(n+1) | nc -u 127.0.0.1 14556 
+```
 
 Execute these in the following order : (2) (3) (1)
 Usualy, when you execute the (2) command, socat will open 2 virtual ports :
 ex : 
-
-- 2016/05/27 17:44:53 socat[24892] N PTY is /dev/pts/12
-- 2016/05/27 17:44:53 socat[24892] N PTY is /dev/pts/13
-- 2016/05/27 17:44:53 socat[24892] N starting data transfer loop with FDs[3,3] 
+```
+  2016/05/27 17:44:53 socat[24892] N PTY is /dev/pts/12
+  2016/05/27 17:44:53 socat[24892] N PTY is /dev/pts/13
+  2016/05/27 17:44:53 socat[24892] N starting data transfer loop with FDs[3,3] 
 and [5,5]
-
+```
 Here, n = 12, n+1 = 13
 
 Things to change before launching the main program :
+```
 - in inc/serial_port.h , change #define RS232_DEVICE to "/dev/pts/n"
+```
 
 Then compile and execute :
-- make -f makefile.pc
-- ./mavlink_control
-
+```
+  make -f makefile.pc
+  ./mavlink_control
+```
 
 # Testing on a real drone :
 WARNING : You need to configure the drone correctly with qgroundcontrol before 
@@ -196,12 +229,15 @@ flashing it)
 
 Use a FTDI converter to connect to Serial 4 (on the pixhawk), and run this in 
 a terminal:
-- screen /dev/ttyUSB0 57600 8N1
-- You can use a radio connection with this one.
-
+```
+  screen /dev/ttyUSB0 57600 8N1
+  You can use a radio connection with this one.
+```
 and hit enter, you'll see a NuttxShell prompt waiting.
 Tap in: 
-- commander arm
+```
+  commander arm
+```
 
 You'll see the motors start spining.
 Connect the STM32F4-discovery to power now.
@@ -211,19 +247,20 @@ to enter the offboard control mode yourself :
 - commander mode offboard 
 
 # Testing the interface
-
-- git clone https://github.com/MHageH/c_uart_interface.git
-- cd c_uart_interface
-
-# Testing the last modifications and Beta version 
-- git checkout Beta
-- git pull origin Beta
-
+```
+  git clone https://github.com/MHageH/c_uart_interface.git
+  cd c_uart_interface
+```
+# Testing the last modifications and Beta version
+```
+  git checkout Beta
+  git pull origin Beta
+```
 Connect the STM32F4-discovery now, then:
-
-- make
-- make flash
-
+```
+  make
+  make flash
+```
 It should work by now
 
 # Generate Graphs 
@@ -231,9 +268,11 @@ To better understand the inner working of such application, as well as a
 fast way to start programming it, function call graphs can be automatically
 generated :
 
-- make graph
-
+```
+ make graph
+```
 Requirements :
-- Graphviz
-- egypt
-
+```
+ Graphviz
+ egypt
+```
