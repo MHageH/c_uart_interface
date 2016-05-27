@@ -6,6 +6,8 @@ uint8_t          msgReceived;
 volatile uint32_t ticks_sec = 0;
 extern volatile float seconds;
 
+extern volatile float highres_flag;
+
 #define N 256
 
 char buffer[N];
@@ -88,7 +90,7 @@ void usart3_isr(void){
 		if (((USART_CR1(USART3) & USART_CR1_RXNEIE) != 0) 
 		 && ((USART_SR(USART3) & USART_SR_RXNE) != 0)) {
 
-			gpio_toggle(GPIOD, GPIO12);
+			// gpio_toggle(GPIOD, GPIO12);
 
 			if (b_index == N) b_index = 0; 
 
@@ -102,6 +104,8 @@ void usart3_isr(void){
 void tim2_isr (void) { 
 	ticks_sec++;
 	seconds = seconds + 0.25;
+
+	highres_flag = 0;
 
 		if (timer_get_flag(TIM2, TIM_SR_CC1IF)){
 			timer_clear_flag(TIM2, TIM_SR_CC1IF);
@@ -149,7 +153,7 @@ int serial_read_message(mavlink_message_t &message){
 
 		if(mavlink_index == N) mavlink_index = 0;
 
-		if (msgReceived) gpio_toggle(GPIOD, GPIO14);
+		// if (msgReceived) gpio_toggle(GPIOD, GPIO14);
 
 	return msgReceived;
 		}

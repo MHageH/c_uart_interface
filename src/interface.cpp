@@ -10,6 +10,10 @@ bool time_to_exit;
 Mavlink_Messages current_messages;
 mavlink_set_position_target_local_ned_t current_setpoint;
 
+// MOD :: asynchronous
+ float highres_flag = 1;
+//
+
 // Initialisation
 
 void autopilot_intialize(void){
@@ -140,7 +144,7 @@ void read_messages(void){
 				case MAVLINK_MSG_ID_LOCAL_POSITION_NED:
 				{
 					#ifdef STM32F4				
-					// gpio_toggle(GPIOD, GPIO14);
+						gpio_toggle(GPIOD, GPIO14);
 					#endif
 					//printf("MAVLINK_MSG_ID_LOCAL_POSITION_NED\n");
 					mavlink_msg_local_position_ned_decode(&message, &(current_messages.local_position_ned));
@@ -226,6 +230,8 @@ void global_read_messages(void){
 	bool received_all = false;  // receive only one message
 	Time_Stamps this_timestamps;
 
+	highres_flag = 1;
+
 	// Blocking wait for new data
 	while ( !received_all ){ // and !time_to_exit
 		//   READ MESSAGE
@@ -268,7 +274,7 @@ void global_read_messages(void){
 
 				case MAVLINK_MSG_ID_LOCAL_POSITION_NED:{
 					#ifdef STM32F4
-					// gpio_toggle(GPIOD, GPIO14);
+					   gpio_toggle(GPIOD, GPIO14);
 					#endif
 					mavlink_msg_local_position_ned_decode(&message, &(current_messages.local_position_ned));
 					current_messages.time_stamps.local_position_ned = get_time_usec();
@@ -298,6 +304,7 @@ void global_read_messages(void){
 					}
 
 				case MAVLINK_MSG_ID_HIGHRES_IMU: {
+					gpio_toggle(GPIOD, GPIO13);
 					mavlink_msg_highres_imu_decode(&message, &(current_messages.highres_imu));
 					current_messages.time_stamps.highres_imu = get_time_usec();
 					this_timestamps.highres_imu = current_messages.time_stamps.highres_imu;
@@ -316,21 +323,11 @@ void global_read_messages(void){
 			} // end: switch msgid
 		} // end: if read message
 
-			// Check for receipt of all items
-		received_all =
-		//		this_timestamps.heartbeat                  &&
-		//				this_timestamps.battery_status             &&
-		//				this_timestamps.radio_status               &&
-		//				this_timestamps.local_position_ned         
-		//				this_timestamps.global_position_int        &&
-		//				this_timestamps.position_target_local_ned  &&
-		//				this_timestamps.position_target_global_int &&
-						this_timestamps.highres_imu               // &&
-		//				this_timestamps.attitude                   &&
-			// :: MOD : disabled for fast debugging
-			//	this_timestamps.sys_status
-				;		
-		} // end: while not received all
+		received_all = this_timestamps.highres_imu;	
+
+		if (highres_flag == 0) break;
+
+		} 
 	return;
 	}
 //
@@ -455,7 +452,7 @@ void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &f
 				autopilot_update_setpoint(final_set_point);
 				autopilot_write_setpoint();
 				#ifdef STM32F4
-				//gpio_toggle(GPIOD, GPIO13);
+				gpio_toggle(GPIOD, GPIO13);
 				#endif
 					}
 
