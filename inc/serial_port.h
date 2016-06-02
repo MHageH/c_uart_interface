@@ -69,7 +69,7 @@ void sendcmd(int,char*);
 
 // Moded for socat bridge
 // Modify it back to /dev/ttyUSB0 or the required port
-#define RS232_DEVICE "/dev/pts/12"
+#define RS232_DEVICE "/dev/ttyUSB0"
 // 
 
 
