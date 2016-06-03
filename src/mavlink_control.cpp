@@ -1,6 +1,6 @@
 #include "mavlink_control.h"
 
-mavlink_set_position_target_local_ned_t initial_position;
+extern mavlink_set_position_target_local_ned_t initial_position;
 
 int value_mg_x, value_mg_y, value_mg_z;
 
@@ -27,7 +27,6 @@ int main(void){
 	#endif
 
 	serial_start();
-	autopilot_start();
 
 	while (1) {
 		commands();
@@ -43,6 +42,7 @@ void commands(void){
 	}
 void operation (float timer){
 	read_messages();
+	autopilot_start();
 	autopilot_write_helper();
 
 	mavlink_set_position_target_local_ned_t set_point;

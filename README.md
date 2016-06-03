@@ -30,14 +30,15 @@ LIS3DSH (joystick like behavior)
 Fixed mavlink library
 - asynchronous read() mechanism using USART interrupts
 - Recombine general_read_messages () and read_messages()
+- Added initial position acquisation
 
 ## TODO
 - Reduce timer prescaler
 - Make timer_isr dependent functions more general (works with any value of the 
 prescaler)
-- Add intial position acquisation
 - Add disable_offboard_control () on exit failure
-- Employ correction algorithms based on external sensor input
+- Employ correction algorithms based on external sensor input (work on 
+Sensor_bridge)
 - Add support for other boards
  
 # Requirements

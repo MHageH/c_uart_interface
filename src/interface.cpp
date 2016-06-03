@@ -10,6 +10,12 @@ bool time_to_exit;
 Mavlink_Messages current_messages;
 mavlink_set_position_target_local_ned_t current_setpoint;
 
+// Initial position
+
+mavlink_set_position_target_local_ned_t initial_position;
+int initial_position_lock = 0;
+
+
 float highres_flag = 1;
 int lock_read_messages = 0;
 
@@ -56,22 +62,23 @@ void autopilot_start(void){
 	}
 
 	*/
-	/*
-	// copy initial position ned
-	Mavlink_Messages local_data = current_messages;
-	initial_position.x        = local_data.local_position_ned.x;
-	initial_position.y        = local_data.local_position_ned.y;
-	initial_position.z        = local_data.local_position_ned.z;
-	initial_position.vx       = local_data.local_position_ned.vx;
-	initial_position.vy       = local_data.local_position_ned.vy;
-	initial_position.vz       = local_data.local_position_ned.vz;
-	initial_position.yaw      = local_data.attitude.yaw;
-	initial_position.yaw_rate = local_data.attitude.yawspeed;
-	
-	*/
-	//autopilot_write();
 
+	// copy initial position ned
+	if (initial_position_lock == 0){
+		Mavlink_Messages local_data = current_messages;
+		initial_position.x        = local_data.local_position_ned.x;
+		initial_position.y        = local_data.local_position_ned.y;
+		initial_position.z        = local_data.local_position_ned.z;
+		initial_position.vx       = local_data.local_position_ned.vx;
+		initial_position.vy       = local_data.local_position_ned.vy;
+		initial_position.vz       = local_data.local_position_ned.vz;
+		initial_position.yaw      = local_data.attitude.yaw;
+		initial_position.yaw_rate = local_data.attitude.yawspeed;
+	}
+	initial_position_lock = 1;
 	
+
+	//autopilot_write();
 
 	return;
 	}
