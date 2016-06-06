@@ -6,7 +6,7 @@ The original c_uart_interface_example can be found here (maintained by Lorenz
 Meier): [mavlink_control](https://github.com/mavlink/c_uart_interface_example)
 
 ##This modification is an Experimental build to test new functionnalities for
-##the Beta version.
+the Beta version.
 
 This version is stripped down to bare minimum (all these elements have been 
 removed): 
