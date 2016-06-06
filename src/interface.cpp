@@ -36,8 +36,6 @@ void autopilot_intialize(void){
 
 	}
 void autopilot_start(void){
-	//send_string("Entered autopilot_start\r\n");
-
 	//read_messages();
 	/*
 	while ( not current_messages.sysid ){
@@ -77,9 +75,6 @@ void autopilot_start(void){
 	}
 	initial_position_lock = 1;
 	
-
-	//autopilot_write();
-
 	return;
 	}
 
