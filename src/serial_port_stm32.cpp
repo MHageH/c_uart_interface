@@ -4,8 +4,8 @@ mavlink_status_t status;
 uint8_t          msgReceived;
 
 volatile uint32_t ticks_sec = 0;
-extern volatile float seconds;
 
+extern volatile float seconds;
 extern volatile float highres_flag;
 
 #define N 256
@@ -103,7 +103,7 @@ void usart3_isr(void){
 void tim2_isr (void) { 
 	ticks_sec++;
 	seconds = seconds + 0.25;
-
+	//gpio_toggle(GPIOD, GPIO12);
 	highres_flag = 0;
 
 		if (timer_get_flag(TIM2, TIM_SR_CC1IF)){

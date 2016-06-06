@@ -10,7 +10,7 @@ bool lock_ = false;
 
 int Program_counter = 0; 
 
-float seconds = 0;
+volatile float seconds = 0;
 
 #ifndef STM32F4
 	time_t end;
@@ -38,7 +38,8 @@ int main(void){
 // Scheduler
 void commands(void){
 	//
-		operation(3);
+		//operation(3);
+		square_operation(3);
 	}
 void operation (float timer){
 	read_messages();
@@ -138,6 +139,59 @@ void operation (float timer){
 		// OLD :: if (Program_counter == 0 || Program_counter == 6) { Program_counter = 1;}
 		if (Program_counter == 0 || Program_counter == 3) { Program_counter = 2;}
 	}
+
+void square_operation (float timer){
+	read_messages();
+	autopilot_start();
+	autopilot_write_helper();
+
+	mavlink_set_position_target_local_ned_t set_point;
+	mavlink_set_position_target_local_ned_t ip = initial_position;
+
+
+	switch(Program_counter){
+			case 0 : 
+				enable_offboard_control();
+
+				#ifndef STM32F4
+					printf("Offboard control Enabled \n");
+				#endif
+
+				break;
+			case 1 :
+					set__( 1 , 0, -2, set_point); break;
+			case 2 :
+					set__( 2, 0, -2, set_point); break;
+			case 3 :
+					set__( 2, 2, -2, set_point); break;
+			case 4 :
+					set__( 0 , 2, -2, set_point); break; 
+			case 5 :
+					set__( 0 , 0, -2, set_point); break;
+			default : break;
+		}
+
+		#ifndef STM32F4
+			end =  time(NULL);
+				//printf("Time lapse : %d \n", end - begin);
+		if ((end - begin) >= timer){
+				begin = time(NULL);
+				printf("Operation : %d \n", Program_counter);
+				Program_counter++;
+			}
+
+		#else 
+			
+		if (seconds >= timer){
+			Program_counter++;
+			seconds = 0;
+		}
+
+		#endif
+		// OLD :: if (Program_counter == 0 || Program_counter == 6) { Program_counter = 1;}
+		if (Program_counter == 0 || Program_counter == 6) { Program_counter = 1;}
+	}
+
 
 // Function Helpers
 void autopilot_write_helper(void){
