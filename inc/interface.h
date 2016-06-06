@@ -3,6 +3,7 @@
 
 #include <serial_port.h>
 
+
                                                 // bit number  876543210987654321
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION     0b0000110111111000
 #define MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY     0b0000110111000111
@@ -110,8 +111,12 @@ int toggle_offboard_control( bool flag );
 
 // Control
 
+// Mathematical approximations
+#include <mfunctions.h>
+
 void set_position(float x, float y, float z, mavlink_set_position_target_local_ned_t &sp);
 void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &set_point);
+void set_circle (float R, float theta, float z, mavlink_set_position_target_local_ned_t &set_point);
 
 uint64_t get_time_usec(void);
 

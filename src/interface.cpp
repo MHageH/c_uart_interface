@@ -327,7 +327,12 @@ void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &f
 		#endif
 
 		}
+void set_circle(float R, float theta, float z, mavlink_set_position_target_local_ned_t &set_point){
+	set__( (R * tan_2pi(theta))/Beta(theta)  , R / Beta(theta), z, set_point);
+	}
 
+
+// Time 
 uint64_t get_time_usec(void){
 	static struct timeval _time_stamp;
 	get_time_sec(&_time_stamp, NULL);
