@@ -18,6 +18,12 @@ volatile float omega = 0;
 	time_t begin =  time(NULL);
 #endif
 
+void initial_delay(void){
+	for (int i = 0; i < 1000000; i++){
+		__asm__("NOP");
+	}
+	}	
+
 int main(void){
 	autopilot_intialize();
 
@@ -38,10 +44,10 @@ int main(void){
 
 // Scheduler
 void commands(void){
-	 	takeoff(10);
+	 	//takeoff(10);
 		//operation(3);
 		//square_operation(3);
-		//circle_operation(3);
+		circle_operation(5);
 	}
 void takeoff (float timer){
 	read_messages();
@@ -240,8 +246,9 @@ void circle_operation (float timer){
 
 	switch(Program_counter){
 			case 0 : 
-
 				enable_offboard_control();
+				initial_delay();
+				Program_counter = 1;
 				break;
 			case 1 :
 					set__( 1 , 0, - 2.5, set_point); break;
