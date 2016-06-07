@@ -53,7 +53,7 @@ void commands(void){
 		//operation(3);
 		//square_operation(3);
 		//circle_operation(5);
-		automatic_takeoff(5);
+		automatic_takeoff(7);
 	}
 void takeoff (float timer){
 	read_messages();
@@ -315,26 +315,37 @@ void automatic_takeoff (float timer){
 					Program_counter = 2;
 					break;
 			case 2 : 
-					set__( 1 , 0, - 2.5, set_point); break;
+					set__( 0 , 0, - 5, set_point); break;
 			case 3 : 
-					set__( 0 , 0 , 0 , set_point); break;
-			case 4 :
 					#ifndef STM32F4
 						printf("Disabled offboard control\n");
 					#endif
 
-					disable_offboard_control();
-
+					disable_offboard_control(); 
+					Program_counter = 4; 
+					break;
+			case 4 :					
 					Program_counter = 5;
 					break;
-			case 5 :
+			case 5 : 
+					#ifndef STM32F4
+						printf("Ideling..\n");
+					#else 
+						__asm__("NOP");
+					#endif
+						break;
+			case 6 :
+
+
+					//disable_offboard_control();
 					#ifndef STM32F4
 						printf("Disarmed \n");
 					#endif
 
 					autopilot_disarm();
-					
-					Program_counter = 6;
+
+
+					Program_counter = 7;
 					break;
 
 			default : break;
@@ -361,7 +372,7 @@ void automatic_takeoff (float timer){
 
 		// OLD ::
 		//    if (Program_counter == 0 || Program_counter == 4) { Program_counter = 2;}
-			if (Program_counter == 7) { Program_counter = 6;}
+			if (Program_counter == 7) { Program_counter = 7;}
 	}
 
 // Function Helpers
