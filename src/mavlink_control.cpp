@@ -2,6 +2,11 @@
 
 extern mavlink_set_position_target_local_ned_t initial_position;
 
+// Testing 
+extern char arm_status;
+extern char control_status;
+//
+
 int value_mg_x, value_mg_y, value_mg_z;
 
 // Scheduler related
@@ -47,7 +52,8 @@ void commands(void){
 	 	//takeoff(10);
 		//operation(3);
 		//square_operation(3);
-		circle_operation(5);
+		//circle_operation(5);
+		automatic_takeoff(5);
 	}
 void takeoff (float timer){
 	read_messages();
@@ -65,7 +71,7 @@ void takeoff (float timer){
 			case 1 :
 					set__( 0 , 0, - 2.5, set_point); break;
 			case 2 :
-					set__( 0 , 0, 0 , set_point); break;
+					set__( 0 , 0 , 0 , set_point); break;
 			default : break;
 		}
 		#ifndef STM32F4
@@ -280,7 +286,77 @@ void circle_operation (float timer){
 		#endif
 		if (Program_counter == 0 || Program_counter == 3) { Program_counter = 2;}
 	}
+void automatic_takeoff (float timer){
+	read_messages();
+	autopilot_start();
+	autopilot_write_helper();
 
+	mavlink_set_position_target_local_ned_t set_point;
+	mavlink_set_position_target_local_ned_t ip = initial_position;
+
+	switch(Program_counter){
+			case 0 :
+					#ifndef STM32F4
+						printf("Enable offboard control\n");
+					#endif
+
+					arm_status = true; 
+					enable_offboard_control();
+					Program_counter = 1;
+					break;
+			case 1 :
+					set__( 1 , 0, - 2.5, set_point); break;
+			case 2 : 
+					set__( 0 , 0 , 0 , set_point); break;
+			case 3 :
+					#ifndef STM32F4
+						printf("Disarmed \n");
+					#endif
+
+					autopilot_disarm();
+
+
+					Program_counter = 4;
+					break;
+			case 4 :
+
+					#ifndef STM32F4
+						printf("Disabled offboard control\n");
+					#endif
+
+					disable_offboard_control();
+					
+					Program_counter = 5;
+					break;
+			//case 5 : 
+			//		set__(0, 0, -10, set_point); break;
+			//		break;
+			default : break;
+		}
+		
+		#ifndef STM32F4
+
+			end =  time(NULL);
+		
+			if ((end - begin) >= timer){
+				begin = time(NULL);
+				printf("Operation : %d \n", Program_counter);
+				Program_counter++;
+			}
+
+		#else 
+			
+			if (seconds >= timer){
+				Program_counter++;
+				seconds = 0;
+			}
+
+		#endif
+
+		// OLD ::
+		//    if (Program_counter == 0 || Program_counter == 4) { Program_counter = 2;}
+			if (Program_counter == 6) { Program_counter = 5;}
+	}
 
 // Function Helpers
 void autopilot_write_helper(void){

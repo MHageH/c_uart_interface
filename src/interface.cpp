@@ -1,6 +1,7 @@
 #include "interface.h"
 
 char control_status;
+char arm_status;
 
 int system_id;
 int autopilot_id;
@@ -25,6 +26,7 @@ void autopilot_intialize(void){
 	// initialize attributes
 
 	control_status = 0;      // whether the autopilot is in offboard control mode
+	arm_status = 0; 		 // whether the autopilot is armed or not
 	time_to_exit   = false;  // flag to signal thread exit
 
 	system_id    = 1; // system id
@@ -295,12 +297,56 @@ int toggle_offboard_control( bool flag ){
 	com.target_component = autopilot_id;
 	com.command          = MAV_CMD_NAV_GUIDED_ENABLE;
 	com.confirmation     = true;
-	//com.param1           = (int32_t) flag; // flag >0.5 => start, <0.5 => stop
-	com.param1 			 = 1;
+	com.param1           = (float) flag; // flag >0.5 => start, <0.5 => stop
+	//com.param1 			 = 1;
 
 	// Encode
 	mavlink_message_t message;
 	mavlink_msg_command_long_encode(system_id, companion_id, &message, &com);
+
+	// Send the message
+	int len = serial_write_message(message);
+
+	// Done!
+	return len;
+	}
+
+// Arm/disarm Control
+void autopilot_arm(void){
+	if ( arm_status == false ){
+		int success = toggle_arm_disarm( true );
+		if ( success ) {
+			arm_status = true;
+		}
+	} 
+	}
+void autopilot_disarm(void){
+	if ( arm_status == true ){
+		int success = toggle_arm_disarm( false );
+
+		if ( success ){
+			arm_status = false;
+		}
+	} 
+	}
+
+int toggle_arm_disarm( bool flag ){
+	mavlink_command_long_t autopilot_status = { 0 };
+	autopilot_status.target_system    = system_id;
+	autopilot_status.target_component = autopilot_id;
+	autopilot_status.command          = MAV_CMD_COMPONENT_ARM_DISARM;
+	autopilot_status.confirmation     = true;
+	autopilot_status.param1           = (float) flag; // flag = 1 => arm, flag = 0 => disarm
+
+	/*
+	#ifndef STM32F4
+	printf("PARAM1  = ", autopilot_status.param1);
+	#endif
+	*/
+
+	// Encode
+	mavlink_message_t message;
+	mavlink_msg_command_long_encode(system_id, companion_id, &message, &autopilot_status);
 
 	// Send the message
 	int len = serial_write_message(message);

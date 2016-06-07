@@ -109,6 +109,12 @@ void disable_offboard_control(void);
 void enable_offboard_control(void);
 int toggle_offboard_control( bool flag );
 
+// Arm/Disarm Control
+
+void autopilot_arm (void);
+void autopilot_disarm(void);
+int toggle_arm_disarm(bool flag);
+
 // Control
 
 // Mathematical approximations
