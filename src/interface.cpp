@@ -363,8 +363,25 @@ void set_position(float x, float y, float z, mavlink_set_position_target_local_n
 	set_position.x   = x; set_position.y   = y; set_position.z   = z;
 	
 	}
+void set_velocity(float vx, float vy, float vz, mavlink_set_position_target_local_ned_t &sp){
+	sp.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY;
+	sp.coordinate_frame = MAV_FRAME_LOCAL_NED;
+
+	sp.vx  = vx; sp.vy  = vy; sp.vz  = vz;
+
+	}
 void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &final_set_point){
 		set_position( x , y  , z, final_set_point);
+		autopilot_update_setpoint(final_set_point);
+		autopilot_write_setpoint();
+
+		#ifdef STM32F4
+			gpio_toggle(GPIOD, GPIO13);
+		#endif
+
+		}
+void speed_set(float vx, float vy, float vz, mavlink_set_position_target_local_ned_t &final_set_point){
+		set_velocity( vx , vy  , vz, final_set_point);
 		autopilot_update_setpoint(final_set_point);
 		autopilot_write_setpoint();
 
