@@ -28,6 +28,7 @@ struct Time_Stamps{
 	uint64_t position_target_global_int;
 	uint64_t highres_imu;
 	uint64_t attitude;
+	uint64_t command_ack;
 
 	void reset_timestamps(){
 		heartbeat = 0;
@@ -40,6 +41,7 @@ struct Time_Stamps{
 		position_target_global_int = 0;
 		highres_imu = 0;
 		attitude = 0;
+		command_ack = 0;
 	}
 	};
 struct Mavlink_Messages {
@@ -79,6 +81,8 @@ struct Mavlink_Messages {
 
 	// System Parameters?
 
+	// Command acknowledgement
+	mavlink_command_ack_t command_ack;
 
 	// Time Stamps
 	Time_Stamps time_stamps;
@@ -113,6 +117,11 @@ int toggle_offboard_control( bool flag );
 void autopilot_arm (void);
 void autopilot_disarm(void);
 int toggle_arm_disarm(bool flag);
+
+// MAVLink messages acknowledgement
+int check_offboard_control(void);
+int check_arm_disarm(void);
+int check_message (uint16_t COMMAND_ID);
 
 // Control
 

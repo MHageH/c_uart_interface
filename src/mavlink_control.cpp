@@ -4,8 +4,8 @@ extern mavlink_set_position_target_local_ned_t initial_position;
 extern mavlink_set_position_target_local_ned_t ip;
 
 // Testing 
-extern char arm_status;
-extern char control_status;
+// extern char arm_status;
+// extern char control_status;
 //
 
 int value_mg_x, value_mg_y, value_mg_z;
@@ -216,7 +216,7 @@ void square_operation (float timer){
 						printf("Enable offboard control\n");
 					#endif
 
-					arm_status = true; 
+					//arm_status = true; 
 					enable_offboard_control();
 
 					Program_counter = 2;
@@ -337,13 +337,14 @@ void automatic_takeoff (float timer){
 
 	switch(Program_counter){
 			case 0 :
-					printf("Acquired Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
 					#ifndef STM32F4
+						printf("Acquired Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
 						printf("Arming\n");
 					#endif
 
 					autopilot_arm();
-				
+					check_arm_disarm();
+
 					#ifndef STM32F4
 						usleep(100);
 					#endif
@@ -355,8 +356,11 @@ void automatic_takeoff (float timer){
 						printf("Enable offboard control\n");
 					#endif
 
-					arm_status = true; 
 					enable_offboard_control();
+	
+					if(check_offboard_control() == 0){
+						enable_offboard_control();
+					}
 
 					#ifndef STM32F4
 						usleep(100);

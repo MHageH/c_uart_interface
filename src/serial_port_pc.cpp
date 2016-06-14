@@ -54,8 +54,8 @@ int serial_write_message(const mavlink_message_t &message){
      write(fd,&buff[i],1);
     }
 
-    len = 0;
     bytesWritten = len;
+    len = 0;
     return bytesWritten;
   }
 

@@ -99,9 +99,21 @@ void read_messages(void){
 
 		if(success){
 			switch (message.msgid){
+
+				case MAVLINK_MSG_ID_COMMAND_ACK:{
+					#ifndef STM32F4
+						printf("Command acknowledgement recieved\n");
+					#endif 
+
+					mavlink_msg_command_ack_decode(&message, &(current_messages.command_ack));
+					current_messages.time_stamps.command_ack = get_time_usec();
+					this_timestamps.command_ack = current_messages.time_stamps.command_ack;
+					break;
+					}
+
 				case MAVLINK_MSG_ID_HEARTBEAT:{
 					#ifdef STM32F4
-					gpio_toggle(GPIOD, GPIO12);
+						gpio_toggle(GPIOD, GPIO12);
 					#endif
 					mavlink_msg_heartbeat_decode(&message, &(current_messages.heartbeat));
 					current_messages.time_stamps.heartbeat = get_time_usec();
@@ -269,6 +281,7 @@ void enable_offboard_control(void){
 
 		// Sends the command to go off-board
 		int success = toggle_offboard_control( true );
+
 		// Check the command was written
 		if ( success )
 			control_status = true;
@@ -302,6 +315,7 @@ int toggle_offboard_control( bool flag ){
 	com.param1           = (float) flag; // flag >0.5 => start, <0.5 => stop
 	//com.param1 			 = 1;
 
+
 	// Encode
 	mavlink_message_t message;
 	mavlink_msg_command_long_encode(system_id, companion_id, &message, &com);
@@ -331,7 +345,6 @@ void autopilot_disarm(void){
 		}
 	} 
 	}
-
 int toggle_arm_disarm( bool flag ){
 	mavlink_command_long_t autopilot_status = { 0 };
 	autopilot_status.target_system    = system_id;
@@ -339,12 +352,6 @@ int toggle_arm_disarm( bool flag ){
 	autopilot_status.command          = MAV_CMD_COMPONENT_ARM_DISARM;
 	autopilot_status.confirmation     = true;
 	autopilot_status.param1           = (float) flag; // flag = 1 => arm, flag = 0 => disarm
-
-	/*
-	#ifndef STM32F4
-	printf("PARAM1  = ", autopilot_status.param1);
-	#endif
-	*/
 
 	// Encode
 	mavlink_message_t message;
@@ -356,6 +363,52 @@ int toggle_arm_disarm( bool flag ){
 	// Done!
 	return len;
 	}
+
+// MAVLink messages acknowledgement
+
+int check_offboard_control(void){
+	// check offboard control message reception
+	int success = check_message(MAV_CMD_NAV_GUIDED_ENABLE);
+
+	if (success){
+		#ifndef STM32F4
+			printf("Offboard control checked\n");
+		#endif
+			return success;
+	} else {
+		#ifndef STM32F4
+			printf("Offboard control check failed\n");
+		#endif
+			return 0;
+	}
+	}
+int check_arm_disarm(void){
+	// check offboard control message reception
+	int success = check_message(MAV_CMD_COMPONENT_ARM_DISARM);
+
+	if (success){
+		#ifndef STM32F4
+		printf("Arm/disarm checked\n");
+		#endif
+		return success;
+	} else {
+		#ifndef STM32F4
+		printf("Arm/disarm check failed\n");
+		#endif
+		return 0;
+	}
+	}
+int check_message(uint16_t COMMAND_ID){
+	if(current_messages.command_ack.command = COMMAND_ID &&
+	   current_messages.command_ack.result == MAV_RESULT_ACCEPTED){
+		return 1;
+	}
+	else {
+		return 0;
+	}
+
+	}
+
 
 // Control
 void set_position(float x, float y, float z, mavlink_set_position_target_local_ned_t &set_position){
