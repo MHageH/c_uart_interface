@@ -11,7 +11,7 @@ static int fd;
 
 // Initialisation
 void serial_start(void){
-    printf("Open port : /dev/ttyUSB0 \n");
+    printf("Open port : %s\n", RS232_DEVICE);
     fd = open(RS232_DEVICE, O_RDWR | O_NOCTTY ); 
     
         if (fd <0) {

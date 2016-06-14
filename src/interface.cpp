@@ -14,6 +14,7 @@ mavlink_set_position_target_local_ned_t current_setpoint;
 // Initial position
 
 mavlink_set_position_target_local_ned_t initial_position;
+mavlink_set_position_target_local_ned_t ip;
 int initial_position_lock = 0;
 
 
@@ -74,6 +75,7 @@ void autopilot_start(void){
 		initial_position.vz       = local_data.local_position_ned.vz;
 		initial_position.yaw      = local_data.attitude.yaw;
 		initial_position.yaw_rate = local_data.attitude.yawspeed;
+		ip = initial_position;
 	}
 	initial_position_lock = 1;
 	
@@ -380,7 +382,8 @@ void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &f
 		#endif
 
 		}
-void speed_set(float vx, float vy, float vz, mavlink_set_position_target_local_ned_t &final_set_point){
+void position_and_speed_set(float x, float y, float z ,float vx, float vy, float vz, mavlink_set_position_target_local_ned_t &final_set_point){
+		set_position( x , y  , z, final_set_point);
 		set_velocity( vx , vy  , vz, final_set_point);
 		autopilot_update_setpoint(final_set_point);
 		autopilot_write_setpoint();
