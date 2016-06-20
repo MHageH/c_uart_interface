@@ -374,7 +374,7 @@ int check_offboard_control(void){
 		#ifndef STM32F4
 			printf("Offboard control checked\n");
 		#endif
-			return success;
+			return 1;
 	} else {
 		#ifndef STM32F4
 			printf("Offboard control check failed\n");
@@ -390,7 +390,7 @@ int check_arm_disarm(void){
 		#ifndef STM32F4
 		printf("Arm/disarm checked\n");
 		#endif
-		return success;
+		return 1;
 	} else {
 		#ifndef STM32F4
 		printf("Arm/disarm check failed\n");
