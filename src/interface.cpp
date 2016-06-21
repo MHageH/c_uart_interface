@@ -116,6 +116,9 @@ void read_messages(void){
 						gpio_toggle(GPIOD, GPIO12);
 					#endif
 					mavlink_msg_heartbeat_decode(&message, &(current_messages.heartbeat));
+					#ifndef STM32F4
+						printf("\n MAV mode = %u \n", current_messages.heartbeat.base_mode);
+					#endif 
 					current_messages.time_stamps.heartbeat = get_time_usec();
 					this_timestamps.heartbeat = current_messages.time_stamps.heartbeat;	
 					break;

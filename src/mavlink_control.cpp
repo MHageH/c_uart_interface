@@ -3,6 +3,11 @@
 extern mavlink_set_position_target_local_ned_t initial_position;
 extern mavlink_set_position_target_local_ned_t ip;
 
+#define OFFBOARD_CONTROL_BASE_MODE 157
+#define ARMED_BASE_MODE 209
+
+extern Mavlink_Messages current_messages;
+
 // Testing 
 // extern char arm_status;
 // extern char control_status;
@@ -25,7 +30,7 @@ volatile float omega = 0;
 #endif
 
 void initial_delay(void){
-	for (int i = 0; i < 100000; i++){
+	for (int i = 0; i < 16000; i++){
 		__asm__("NOP");
 	}
 	}	
@@ -342,13 +347,16 @@ void automatic_takeoff (float timer){
 						printf("Arming\n");
 					#endif
 
-					autopilot_arm();
+					if (current_messages.heartbeat.base_mode != ARMED_BASE_MODE){
+						autopilot_arm();
+					}
 
 					#ifndef STM32F4
-						usleep(100);
+						usleep(200);
 					#else 
 						initial_delay();
-					#endif				
+					#endif
+
 					Program_counter = 1;
 
 					break;
@@ -360,12 +368,31 @@ void automatic_takeoff (float timer){
 					enable_offboard_control();
 
 					#ifndef STM32F4
-						usleep(100);
+						usleep(200);
+					#else 
+						initial_delay();
 					#endif
 
-					enable_offboard_control();
+					// enable_offboard_control();
 
 					Program_counter = 2;
+
+					/*	
+					if(current_messages.heartbeat.base_mode != OFFBOARD_CONTROL_BASE_MODE){
+						enable_offboard_control();
+
+						#ifndef STM32F4
+							usleep(100);
+						#else 
+							initial_delay();
+						#endif
+
+					} else {
+						Program_counter = 2;
+					}
+					*/
+
+					// Program_counter = 2;
 
 					/*
 					if(check_offboard_control() == 0){
