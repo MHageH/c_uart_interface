@@ -255,8 +255,10 @@ to enter the offboard control mode yourself :
 ```
   git clone https://github.com/MHageH/c_uart_interface.git
   cd c_uart_interface
+  make -j4 makefile.pc 
+  ./mavlink_control
 ```
-# Testing the last modifications and Beta version
+# Testing the Beta version
 ```
   git checkout Beta
   git pull origin Beta
