@@ -62,10 +62,10 @@ int main(void){
 void commands(void){
 	 	// takeoff(10);
 		// operation(3);
-		 square_operation(7);
+		// square_operation(7);
 		// circle_operation(5);
 		// automatic_takeoff(10);
-		// flight_control_sequence(10);
+		 flight_control_sequence(10);
 		}
 void takeoff (float timer){
 	read_messages();
@@ -111,7 +111,6 @@ void operation (float timer){
 	autopilot_write_helper();
 
 	mavlink_set_position_target_local_ned_t set_point;
-	mavlink_set_position_target_local_ned_t ip = initial_position;
 
 		#ifdef STM32F4
 
@@ -152,41 +151,111 @@ void operation (float timer){
 		#endif
 
 	switch(Program_counter){
-			case 0 : 
+			case 0 :
+					#ifndef STM32F4
+						if (current_messages.heartbeat.base_mode != ARMED_BASE_MODE && arm_lock == 0){
+							printf("Arming\n");
+							autopilot_arm();
+							arm_lock = 1;
+						}
 
-				enable_offboard_control();
-				//enable_offboard_control();
-				#ifdef STM32F4	
-					//gpio_toggle(GPIOD, GPIO13); 
-				#else 
-					printf("Offboard control Enabled \n");
-				#endif
-				break;
+						usleep(200);
+					#else 
+						autopilot_write();
+						autopilot_arm();
+					#endif
+					break;
 			case 1 :
+					#ifndef STM32F4
+						printf("Enable offboard control\n");
+					#endif
+
+					autopilot_write_helper();
+					enable_offboard_control();
+					autopilot_write();
+
+					if (current_messages.heartbeat.base_mode != OFFBOARD_CONTROL_BASE_MODE){
+						control_status = false;
+						autopilot_write();
+						enable_offboard_control();
+						autopilot_write();
+					}		
+		
+					#ifndef STM32F4
+						usleep(100);
+					#endif
+
+					Program_counter = 2;
+					break;
+			case 2 :
 					#ifndef STM32F4
 						printf("Set point 1 \n");
 					#endif
-					set__( 1 , 0, - 2.5, set_point); break;
-			case 2 :
+
+					set_velocity( - 0.25 , - 0.0 , - 0.50 , set_point);
+
 					#ifdef STM32F4
-						set__( 1 + value_mg_y/100 , value_mg_x/100, - 5, set_point); break; 
+
+						if (offboard_control_lock == 0){
+							control_status = false;
+							enable_offboard_control();
+							offboard_control_lock = 1;
+						}		
+
+					#endif 
+
+					set__( 1.0 + ip.x , ip.y , ip.z - 1, set_point); break;
+			case 3 :
+					#ifdef STM32F4
+						set__( 1.0 + (float) (value_mg_y/100) + ip.x , ip.y + (float)(value_mg_x/100), ip.z - 2.0, set_point); break; 
 					#else 
 						// printf("Set point 2 \n");
-						set__( 5 , 0, - 5, set_point); break;
+						set__( 1.0 + ip.x , ip.y, ip.z - 2, set_point); break;
 					#endif
-			/* OLD  ::
-			case 3 :
-					set__( -2 , -2.5, - 2.5, set_point); break;
-			case 4 :
-					set__( -2 , 2.5, - 2.5, set_point); break; 
-			case 5 :
-					set__( -2 , 2.5, - 1000, set_point); break; 
-			*/
+			case 4 : 
+					#ifndef STM32F4
+					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
+					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
+					
+					// printf("Set point 3\n");
+					#endif
+
+					set__( 1.0 + ip.x, ip.y , ip.z - 0.50 , set_point); break;
+			case 5 : 
+					#ifndef STM32F4
+						printf("Disabled offboard control\n");
+						usleep(100);
+					#endif
+
+					disable_offboard_control(); 
+					Program_counter = 6;
+					break;
+			case 6 : 
+					#ifndef STM32F4
+						printf("Ideling..\n");
+					#else 
+						__asm__("NOP");
+					#endif
+						break;
+						Program_counter = 7;
+			case 7 :
+					#ifndef STM32F4
+						printf("Disarmed \n");
+					#else 
+						autopilot_write();
+					#endif
+
+					autopilot_disarm();
+
+
+					Program_counter = 8;
+					break;
+
 			default : break;
 		}
 		#ifndef STM32F4
 			end =  time(NULL);
-				//printf("Time lapse : %d \n", end - begin);
+
 		if ((end - begin) >= timer){
 				begin = time(NULL);
 				printf("Operation : %d \n", Program_counter);
@@ -199,9 +268,10 @@ void operation (float timer){
 			Program_counter++;
 			seconds = 0;
 		}
+
 		#endif
-		// OLD :: if (Program_counter == 0 || Program_counter == 6) { Program_counter = 1;}
-		if (Program_counter == 0 || Program_counter == 3) { Program_counter = 2;}
+
+			if (Program_counter == 8) { Program_counter = 8;}
 	}
 void square_operation (float timer){
 	read_messages();
@@ -338,7 +408,6 @@ void circle_operation (float timer){
 	switch(Program_counter){
 			case 0 : 
 				enable_offboard_control();
-				initial_delay();
 				Program_counter = 1;
 				break;
 			case 1 :
@@ -403,7 +472,15 @@ void automatic_takeoff (float timer){
 
 					autopilot_write_helper();
 					enable_offboard_control();
-					autopilot_write();		
+					autopilot_write();
+
+					if (current_messages.heartbeat.base_mode != OFFBOARD_CONTROL_BASE_MODE){
+						control_status = false;
+						autopilot_write();
+						enable_offboard_control();
+						autopilot_write();
+					}		
+		
 
 					#ifndef STM32F4
 						usleep(100);
@@ -483,6 +560,9 @@ void automatic_takeoff (float timer){
 
 					autopilot_disarm();
 
+					if (current_messages.heartbeat.base_mode == ARMED_BASE_MODE){
+							autopilot_disarm();
+						}
 
 					Program_counter = 9;
 					break;
@@ -597,7 +677,7 @@ void flight_control_sequence (float timer){
 					// printf("Set point 3\n");
 					#endif
 
-					set__( ip.x , ip.y - 2.00 , ip.z - 0.50 , set_point); break;
+					set__( ip.x , ip.y - 2.00 , ip.z - 2.00, set_point); break;
 			case 6 : 
 					#ifndef STM32F4
 					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
