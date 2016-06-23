@@ -56,11 +56,11 @@ int main(void){
 // Scheduler
 void commands(void){
 	 	// takeoff(10);
-		// operation(3);
+		 operation(10);
 		// square_operation(7);
 		// circle_operation(5);
 		// automatic_takeoff(10);
-		 flight_control_sequence(10);
+		// flight_control_sequence(10);
 		}
 void takeoff (float timer){
 	read_messages();
@@ -113,35 +113,38 @@ void operation (float timer){
 		value_mg_y = ((lis3dsh_read_reg(ADD_REG_OUT_Y_H) << 8) | lis3dsh_read_reg(ADD_REG_OUT_Y_L));
 		value_mg_z = ((lis3dsh_read_reg(ADD_REG_OUT_Z_H) << 8) | lis3dsh_read_reg(ADD_REG_OUT_Z_L));
 
-		/* transform X value from two's complement to 16-bit int */
+		// transform X value from two's complement to 16-bit int 
 		value_mg_x = two_compl_to_int16(value_mg_x);
-		/* convert X absolute value to mg value */
+		// convert X absolute value to mg value 
 		value_mg_x = value_mg_x * SENS_2G_RANGE_MG_PER_DIGIT;
-
+		/*
 		char x_acc[sizeof(value_mg_x)];
 		send_string("X acceleration value :");
 		send_string(custom_itoa(value_mg_x, x_acc));
 		send_string("\r\n");
+		*/
 
-		/* transform Y value from two's complement to 16-bit int */
+		// transform Y value from two's complement to 16-bit int 
 		value_mg_y = two_compl_to_int16(value_mg_y);
-		/* convert Y absolute value to mg value */
+		// convert Y absolute value to mg value 
 		value_mg_y = value_mg_y * SENS_2G_RANGE_MG_PER_DIGIT;
-
+		/*
 		char y_acc[sizeof(value_mg_y)];
 		send_string("Y acceleration value :");
 		send_string(custom_itoa(value_mg_y, y_acc));
 		send_string("\r\n");
+		*/
 
-		/* transform Z value from two's complement to 16-bit int */
+		// transform Z value from two's complement to 16-bit int 
 		value_mg_z = two_compl_to_int16(value_mg_z);
-		/* convert Z absolute value to mg value */
+		// convert Z absolute value to mg value 
 		value_mg_z = value_mg_z * SENS_2G_RANGE_MG_PER_DIGIT;
-
+		/*
 		char z_acc[sizeof(value_mg_z)];
 		send_string("Z acceleration value :");
 		send_string(custom_itoa(value_mg_z, z_acc));
 		send_string("\r\n");
+		*/
 
 		#endif
 
@@ -204,7 +207,6 @@ void operation (float timer){
 					#ifdef STM32F4
 						set__( 1.0 + (float) (value_mg_y/100) + ip.x , ip.y + (float)(value_mg_x/100), ip.z - 2.0, set_point); break; 
 					#else 
-						// printf("Set point 2 \n");
 						set__( 1.0 + ip.x , ip.y, ip.z - 2, set_point); break;
 					#endif
 			case 4 : 

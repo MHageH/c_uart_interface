@@ -8,17 +8,22 @@ int autopilot_id;
 int companion_id;
 bool time_to_exit;
 
+// Current messages and current_setpoint definitions
 Mavlink_Messages current_messages;
 mavlink_set_position_target_local_ned_t current_setpoint;
 
-// Initial position
+// Initial position setpoints and first time lock
 
 mavlink_set_position_target_local_ned_t initial_position;
 mavlink_set_position_target_local_ned_t ip;
+
+// Lock for initial position acquisation
 int initial_position_lock = 0;
 
-
+// Highres dependent flag timeout reset 
 float highres_flag = 1;
+
+// First read lock 
 int lock_read_messages = 0;
 
 // Initialisation
@@ -34,37 +39,13 @@ void autopilot_intialize(void){
 	autopilot_id = 1; // autopilot component id
 	companion_id = 0; // companion computer component id
 
-	current_messages.sysid  = system_id;
-	current_messages.compid = autopilot_id;
+	current_messages.sysid  = system_id; // Set current system id to predefined one
+	current_messages.compid = autopilot_id; // Set current autopilot id to predefined one
 
 	}
 void autopilot_start(void){
-	//read_messages();
-	/*
-	while ( not current_messages.sysid ){
-		if ( time_to_exit )
-			return;
-		// usleep(500000); // check at 2Hz
-	}
+	// This is used only once to define the initial position
 
-	if ( not system_id ){
-		system_id = current_messages.sysid;
-	}
-
-	if ( not autopilot_id ){
-		autopilot_id = current_messages.compid;
-	}
-
-	// Wait for initial position ned
-	while ( not ( current_messages.time_stamps.local_position_ned && current_messages.time_stamps.attitude)){
-		if ( time_to_exit )
-			return;
-		//usleep(500000);
-	}
-
-	*/
-
-	// copy initial position ned
 	if (initial_position_lock == 0){
 		Mavlink_Messages local_data = current_messages;
 		initial_position.x        = local_data.local_position_ned.x;
@@ -85,22 +66,24 @@ void autopilot_start(void){
 // READ
 void read_messages(void){
 	bool success;               // receive success flag
-	bool received_all = false;  // receive only one message
+	bool received_all = false;  
 	Time_Stamps this_timestamps;
 
-	highres_flag = 1;
+	highres_flag = 1; // Highres dependent flag reset timeout
 
 	// Blocking wait for new data
 	while ( !received_all ){ // and !time_to_exit
-		//   READ MESSAGE
+		// Read one message at a time and complete the current_messages structure
 		mavlink_message_t message;
 
+		// Read from serial port
 		success = serial_read_message(message);
 
 		if(success){
 			switch (message.msgid){
 
 				case MAVLINK_MSG_ID_COMMAND_ACK:{
+					// Acknowledgement check for pc version
 					#ifndef STM32F4
 						printf("Command acknowledgement recieved\n");
 					#endif 
@@ -112,13 +95,17 @@ void read_messages(void){
 					}
 
 				case MAVLINK_MSG_ID_HEARTBEAT:{
+
 					#ifdef STM32F4
 						gpio_toggle(GPIOD, GPIO12);
 					#endif
+
 					mavlink_msg_heartbeat_decode(&message, &(current_messages.heartbeat));
+					// Verification of current autopilot state from heartbeat base_mode on PC version
 					#ifndef STM32F4
 						printf("\n MAV mode = %u \n", current_messages.heartbeat.base_mode);
 					#endif 
+
 					current_messages.time_stamps.heartbeat = get_time_usec();
 					this_timestamps.heartbeat = current_messages.time_stamps.heartbeat;	
 					break;
@@ -146,9 +133,11 @@ void read_messages(void){
 					}
 
 				case MAVLINK_MSG_ID_LOCAL_POSITION_NED:{
+
 					#ifdef STM32F4
 					   gpio_toggle(GPIOD, GPIO14);
 					#endif
+					
 					mavlink_msg_local_position_ned_decode(&message, &(current_messages.local_position_ned));
 					current_messages.time_stamps.local_position_ned = get_time_usec();
 					this_timestamps.local_position_ned = current_messages.time_stamps.local_position_ned;
@@ -177,7 +166,6 @@ void read_messages(void){
 					}
 
 				case MAVLINK_MSG_ID_HIGHRES_IMU: {
-					//gpio_toggle(GPIOD, GPIO13);
 					mavlink_msg_highres_imu_decode(&message, &(current_messages.highres_imu));
 					current_messages.time_stamps.highres_imu = get_time_usec();
 					this_timestamps.highres_imu = current_messages.time_stamps.highres_imu;
@@ -196,6 +184,8 @@ void read_messages(void){
 			} // end: switch msgid
 		} // end: if read message
 
+		// Loop untill the full reception of the first heartbeat and local_position_ned
+		// for the first time, then depend on the highres MAVLink message for the rest
 		if (lock_read_messages == 0){
 			// Check for receipt of all items
 			received_all =
@@ -208,8 +198,6 @@ void read_messages(void){
 			//				this_timestamps.position_target_global_int &&
 			//				this_timestamps.highres_imu                &&
 			//				this_timestamps.attitude                   &&
-				// :: MOD : disabled for fast debugging
-				//	this_timestamps.sys_status
 						;		
 			} else {
 				received_all = this_timestamps.highres_imu;	
@@ -224,7 +212,8 @@ void read_messages(void){
 // Write
 void autopilot_write(void){
 	// signal startup
-	// prepare an initial setpoint, just stay put
+	// prepare an initial setpoint, just stay put 
+	// void setpoint
 	mavlink_set_position_target_local_ned_t set_point;
 	set_point.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY & MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_RATE;
 	set_point.coordinate_frame = MAV_FRAME_LOCAL_NED;
@@ -241,7 +230,6 @@ void autopilot_write(void){
 		return;
 	}
 void autopilot_write_setpoint(void){
-	//   PACK PAYLOAD
 
 	// pull from position target
 	mavlink_set_position_target_local_ned_t set_point = current_setpoint;
@@ -263,15 +251,14 @@ void autopilot_write_setpoint(void){
 	return;
 	}
 void autopilot_write_message(mavlink_message_t message){
-	// do the write
+	// Write the message to serial port
 	serial_write_message(message);
 
-	// Done!
 	return;
 	}
 void autopilot_update_setpoint(mavlink_set_position_target_local_ned_t setpoint){
 
-	// update_setpoint
+	// Update setpoint
 	current_setpoint = setpoint;
 	}
 
@@ -316,8 +303,6 @@ int toggle_offboard_control( bool flag ){
 	com.command          = MAV_CMD_NAV_GUIDED_ENABLE;
 	com.confirmation     = true;
 	com.param1           = (float) flag; // flag >0.5 => start, <0.5 => stop
-	//com.param1 			 = 1;
-
 
 	// Encode
 	mavlink_message_t message;
@@ -326,29 +311,34 @@ int toggle_offboard_control( bool flag ){
 	// Send the message
 	int len = serial_write_message(message);
 
-	// Done!
 	return len;
 	}
 
 // Arm/disarm Control
 void autopilot_arm(void){
+	// Should only send this command once
 	if ( arm_status == false ){
+		// ARM 
 		int success = toggle_arm_disarm( true );
+		// Check the command was written
 		if ( success ) {
 			arm_status = true;
 		}
 	} 
 	}
 void autopilot_disarm(void){
+	// Should only send this command once
 	if ( arm_status == true ){
+		// DISARM 
 		int success = toggle_arm_disarm( false );
-
+		// Check the command was written
 		if ( success ){
 			arm_status = false;
 		}
 	} 
 	}
 int toggle_arm_disarm( bool flag ){
+	// Prepare command for arming/disarming
 	mavlink_command_long_t autopilot_status = { 0 };
 	autopilot_status.target_system    = system_id;
 	autopilot_status.target_component = autopilot_id;
@@ -363,12 +353,13 @@ int toggle_arm_disarm( bool flag ){
 	// Send the message
 	int len = serial_write_message(message);
 
-	// Done!
 	return len;
 	}
 
 // MAVLink messages acknowledgement
 
+// NEEDS PX4 Master version or stable v1.4 
+// Not yet implemented
 int check_offboard_control(void){
 	// check offboard control message reception
 	int success = check_message(MAV_CMD_NAV_GUIDED_ENABLE);
@@ -386,7 +377,7 @@ int check_offboard_control(void){
 	}
 	}
 int check_arm_disarm(void){
-	// check offboard control message reception
+	// check arm/disarm message reception
 	int success = check_message(MAV_CMD_COMPONENT_ARM_DISARM);
 
 	if (success){
@@ -414,6 +405,7 @@ int check_message(uint16_t COMMAND_ID){
 
 
 // Control
+// Set position function and masks
 void set_position(float x, float y, float z, mavlink_set_position_target_local_ned_t &set_position){
 	set_position.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_POSITION;
 	set_position.coordinate_frame = MAV_FRAME_LOCAL_NED;
@@ -421,6 +413,7 @@ void set_position(float x, float y, float z, mavlink_set_position_target_local_n
 	set_position.x   = x; set_position.y   = y; set_position.z   = z;
 	
 	}
+// Set velocity function and masks
 void set_velocity(float vx, float vy, float vz, mavlink_set_position_target_local_ned_t &sp){
 	sp.type_mask = MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_VELOCITY;
 	sp.coordinate_frame = MAV_FRAME_LOCAL_NED;
@@ -428,6 +421,7 @@ void set_velocity(float vx, float vy, float vz, mavlink_set_position_target_loca
 	sp.vx  = vx; sp.vy  = vy; sp.vz  = vz;
 
 	}
+// Set position, update setpoint and send the message 
 void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &final_set_point){
 		set_position( x , y  , z, final_set_point);
 		autopilot_update_setpoint(final_set_point);
@@ -438,6 +432,7 @@ void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &f
 		#endif
 
 		}
+// Set position and velocity, update setpoint and send the message 
 void position_and_speed_set(float x, float y, float z ,float vx, float vy, float vz, mavlink_set_position_target_local_ned_t &final_set_point){
 		set_position( x , y  , z, final_set_point);
 		set_velocity( vx , vy  , vz, final_set_point);
@@ -449,6 +444,7 @@ void position_and_speed_set(float x, float y, float z ,float vx, float vy, float
 		#endif
 
 		}
+// Draw a circle with R and theta (angle) coordinates from current position
 void set_circle(float R, float theta, float z, mavlink_set_position_target_local_ned_t &set_point){
 	set__( (R * tan_2pi(theta))/Beta(theta)  , R / Beta(theta), z, set_point);
 	}
