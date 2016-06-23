@@ -131,7 +131,9 @@ int check_message (uint16_t COMMAND_ID);
 void set_position(float x, float y, float z, mavlink_set_position_target_local_ned_t &sp);
 void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &set_point);
 void set_velocity(float vx, float vy, float va, mavlink_set_position_target_local_ned_t &set_point);
+void set_yaw(float yaw, mavlink_set_position_target_local_ned_t &sp);
 void position_and_speed_set(float x, float y, float z ,float vx, float vy, float vz, mavlink_set_position_target_local_ned_t &final_set_point);
+
 
 void set_circle (float R, float theta, float z, mavlink_set_position_target_local_ned_t &set_point);
 

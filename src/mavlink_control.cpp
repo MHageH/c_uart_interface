@@ -153,6 +153,7 @@ void operation (float timer){
 					#endif
 
 					set_velocity( - 0.25 , - 0.0 , - 0.50 , set_point);
+					set_yaw (ip.yaw, set_point);
 
 					#ifdef STM32F4
 
@@ -164,11 +165,15 @@ void operation (float timer){
 
 					#endif 
 
-					set__( 1.0 + ip.x , ip.y , ip.z - 1, set_point); break;
+					set__( - 1.0 + ip.x , ip.y , ip.z - 1, set_point); break;
 			case 3 :
 					#ifdef STM32F4
-						set__( 1.0 + (float) (value_mg_y/100) + ip.x , ip.y + (float)(value_mg_x/100), ip.z - 2.0, set_point); break; 
+						set_yaw (ip.yaw, set_point);
+
+						set__( - 1.0 - (float) (value_mg_y/500) + ip.x , ip.y - (float)(value_mg_x/500), ip.z - 2.0, set_point); break; 
 					#else 
+						set_yaw (ip.yaw, set_point);
+
 						set__( 1.0 + ip.x , ip.y, ip.z - 2, set_point); break;
 					#endif
 			case 4 : 
@@ -178,8 +183,9 @@ void operation (float timer){
 					
 					// printf("Set point 3\n");
 					#endif
+					set_yaw (ip.yaw, set_point);
 
-					set__( 1.0 + ip.x, ip.y , ip.z - 0.50 , set_point); break;
+					set__( - 1.0 - (float) (value_mg_y/500) + ip.x , ip.y - (float)(value_mg_x/500), ip.z - 1.0, set_point); break;
 			case 5 : 
 					#ifndef STM32F4
 						printf("Disabled offboard control\n");
@@ -323,6 +329,7 @@ void operation_extended (float timer){
 					#endif
 
 					set_velocity( - 0.25 , - 0.0 , - 0.50 , set_point);
+					set_yaw (ip.yaw, set_point);
 
 					#ifdef STM32F4
 
@@ -534,10 +541,8 @@ void circle_operation (float timer){
 void automatic_takeoff (float timer){
 	read_messages();
 	autopilot_start();
-	//autopilot_write_helper();
 
 	mavlink_set_position_target_local_ned_t set_point;
-	// OLD :: mavlink_set_position_target_local_ned_t ip = initial_position;
 
 	switch(Program_counter){
 			case 0 :
@@ -587,6 +592,7 @@ void automatic_takeoff (float timer){
 					// printf("Set point 1\n");
 					#endif
 
+					set_yaw (ip.yaw, set_point);
 					set_velocity( - 0.25 , - 0.0 , - 0.50 , set_point);
 
 					#ifdef STM32F4
@@ -605,8 +611,8 @@ void automatic_takeoff (float timer){
 					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
 					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
 
-					// printf("Set point 2\n");
 					#endif
+					set_yaw (ip.yaw, set_point);
 					set__( ip.x , ip.y , ip.z - 2.00 , set_point); break;
 			case 4 : 
 					#ifndef STM32F4
@@ -615,8 +621,9 @@ void automatic_takeoff (float timer){
 
 					// printf("Set point 2\n");
 					#endif
-					set__( ip.x , ip.y , ip.z - 1.00 , set_point); break;
 
+					set_yaw (ip.yaw, set_point);
+					set__( ip.x , ip.y , ip.z - 1.00 , set_point); break;
 			case 5 : 
 					#ifndef STM32F4
 					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
@@ -625,6 +632,7 @@ void automatic_takeoff (float timer){
 					// printf("Set point 3\n");
 					#endif
 
+					set_yaw (ip.yaw, set_point);
 					set__( ip.x, ip.y , ip.z - 0.50 , set_point); break;
 			case 6 : 
 					#ifndef STM32F4

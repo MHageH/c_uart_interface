@@ -421,6 +421,11 @@ void set_velocity(float vx, float vy, float vz, mavlink_set_position_target_loca
 	sp.vx  = vx; sp.vy  = vy; sp.vz  = vz;
 
 	}
+void set_yaw(float yaw, mavlink_set_position_target_local_ned_t &sp){
+	sp.type_mask &= MAVLINK_MSG_SET_POSITION_TARGET_LOCAL_NED_YAW_ANGLE ;
+
+	sp.yaw  = yaw;
+	}
 // Set position, update setpoint and send the message 
 void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &final_set_point){
 		set_position( x , y  , z, final_set_point);
