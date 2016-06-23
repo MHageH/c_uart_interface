@@ -47,7 +47,6 @@
 
 /* ------------- Local functions prototypes --------------- */
 
-extern void gpio_setup(void);
 extern void spi_setup(void);
 extern void lis3dsh_init(void);
 extern void lis3dsh_write_reg(int, int);
@@ -55,7 +54,6 @@ extern int lis3dsh_read_reg(int);
 extern void send(uint16_t data);
 extern int two_compl_to_int16(int);
 
-extern void usart_setup(void);
 extern void send_string (char *s_de_char);
 extern char * custom_itoa(int i, char b[]);
 

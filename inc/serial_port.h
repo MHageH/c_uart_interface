@@ -66,7 +66,13 @@ void sendcmd(int,char*);
 
 //#define BAUDRATE B4800
 #define BAUDRATE B57600
-#define RS232_DEVICE "/dev/ttyUSB0"
+
+// Moded for socat bridge
+// Modify it back to /dev/ttyUSB0 or the required port
+#define RS232_DEVICE "/dev/ttyUSB0" 
+//#define RS232_DEVICE "/dev/pts/7"
+// 
+
 
 int usart_recv_blocking(int i);
 

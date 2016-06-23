@@ -1,10 +1,21 @@
 #include "serial_port.h"
 
 mavlink_status_t status;
-uint8_t          msgReceived = false;
+uint8_t          msgReceived;
 
 volatile uint32_t ticks_sec = 0;
+
 extern volatile float seconds;
+extern volatile float highres_flag;
+
+#define N 256
+
+char buffer[N];
+int b_index = 0;
+
+int mavlink_index = 0; 
+
+char b_tmp[N];
 
 // Initialisation
 void serial_start(void){
@@ -32,7 +43,12 @@ void serial_start(void){
   	 usart_set_parity (USART3, USART_PARITY_NONE);
   	 usart_set_flow_control (USART3, USART_FLOWCONTROL_NONE);
   	 // Enable USART3 Receive interrupt. 
-  	 usart_disable_rx_interrupt (USART3);
+
+  	 // OLD :: 
+  	 // usart_disable_rx_interrupt (USART3);
+
+	 usart_enable_rx_interrupt (USART3);  	 
+
   	 // Finally enable the USART. 
   	 usart_enable (USART3);
 
@@ -69,11 +85,26 @@ void usart1_isr (void){
 	//
 	}
 void usart3_isr(void){
-	//
+	static uint8_t data;
+		
+		if (((USART_CR1(USART3) & USART_CR1_RXNEIE) != 0) 
+		 && ((USART_SR(USART3) & USART_SR_RXNE) != 0)) {
+
+			// gpio_toggle(GPIOD, GPIO12);
+
+			if (b_index == N) b_index = 0; 
+
+			data = usart_recv(USART3);
+
+			buffer[b_index] = data;
+			b_index++;
+		}
 	}
 void tim2_isr (void) { 
 	ticks_sec++;
 	seconds = seconds + 0.25;
+	//gpio_toggle(GPIOD, GPIO12);
+	highres_flag = 0;
 
 		if (timer_get_flag(TIM2, TIM_SR_CC1IF)){
 			timer_clear_flag(TIM2, TIM_SR_CC1IF);
@@ -82,11 +113,18 @@ void tim2_isr (void) {
 
 // Serial Read
 int serial_read_message(mavlink_message_t &message){
+		msgReceived = mavlink_parse_char (MAVLINK_COMM_1, buffer[mavlink_index], &message, &status);
 
-   	msgReceived = mavlink_parse_char(MAVLINK_COMM_1, usart_recv_blocking(USART3), &message, &status);
+		if (mavlink_index < b_index){
+			mavlink_index++;
+		} else {
+			mavlink_index = 0;
+		}
 
-	return msgReceived;
-	}
+		if(mavlink_index == N) mavlink_index = 0;
+
+		return msgReceived;
+		}
 
 // Serial write
 int serial_write_message(const mavlink_message_t &message){
@@ -102,10 +140,8 @@ int serial_write_message(const mavlink_message_t &message){
                 gpio_toggle(GPIOD, GPIO15);
 		}
 		
-		len = 0;
-
 		bytesWritten = len;
-
+		len = 0;
 		return bytesWritten;
 		}
 

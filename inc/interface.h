@@ -28,6 +28,7 @@ struct Time_Stamps{
 	uint64_t position_target_global_int;
 	uint64_t highres_imu;
 	uint64_t attitude;
+	uint64_t command_ack;
 
 	void reset_timestamps(){
 		heartbeat = 0;
@@ -40,6 +41,7 @@ struct Time_Stamps{
 		position_target_global_int = 0;
 		highres_imu = 0;
 		attitude = 0;
+		command_ack = 0;
 	}
 	};
 struct Mavlink_Messages {
@@ -79,6 +81,8 @@ struct Mavlink_Messages {
 
 	// System Parameters?
 
+	// Command acknowledgement
+	mavlink_command_ack_t command_ack;
 
 	// Time Stamps
 	Time_Stamps time_stamps;
@@ -93,7 +97,7 @@ void autopilot_intialize(void);
 void autopilot_start(void);
 
 //	READ 
-void global_read_messages(void);
+//void global_read_messages(void);
 void read_messages(void);
 
 // Write
@@ -108,10 +112,28 @@ void disable_offboard_control(void);
 void enable_offboard_control(void);
 int toggle_offboard_control( bool flag );
 
+// Arm/Disarm Control
+
+void autopilot_arm (void);
+void autopilot_disarm(void);
+int toggle_arm_disarm(bool flag);
+
+// MAVLink messages acknowledgement
+int check_offboard_control(void);
+int check_arm_disarm(void);
+int check_message (uint16_t COMMAND_ID);
+
 // Control
+
+// Mathematical approximations
+#include <mfunctions.h>
 
 void set_position(float x, float y, float z, mavlink_set_position_target_local_ned_t &sp);
 void set__(float x, float y, float z, mavlink_set_position_target_local_ned_t &set_point);
+void set_velocity(float vx, float vy, float va, mavlink_set_position_target_local_ned_t &set_point);
+void position_and_speed_set(float x, float y, float z ,float vx, float vy, float vz, mavlink_set_position_target_local_ned_t &final_set_point);
+
+void set_circle (float R, float theta, float z, mavlink_set_position_target_local_ned_t &set_point);
 
 uint64_t get_time_usec(void);
 

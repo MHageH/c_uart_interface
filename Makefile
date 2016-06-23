@@ -25,7 +25,7 @@ SPECIFIC_FLAGS = -MD -DSTM32F4
 LDSTM32F4 = linker/stm32f4-discovery.ld 
 
 # Linker object
-OBJS = $(NAME).o serial_port_stm32.o syscalls.o interface.o lis3dsh.o
+OBJS = $(NAME).o serial_port_stm32.o syscalls.o interface.o lis3dsh.o mfunctions.o
 
 # Linker flags 
 LD_FLAGS= -Wl,--start-group $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -I$(MAVLIB) $(OBJS) \
@@ -43,6 +43,7 @@ $(NAME).elf: $(SRC)/$(NAME).cpp
 	$(CXX) -I$(MAVLIB) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/$(NAME).cpp
 	$(CXX) -I$(MAVLIB) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/interface.cpp
 	$(CXX) -I$(MAVLIB) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/serial_port_stm32.cpp
+	$(CXX) -I$(MAVLIB) -I$(INCLUDE) $(CFLAGS) $(ARCH_FLAGS) $(SPECIFIC_FLAGS) -c $(SRC)/mfunctions.cpp
 	$(CXX) $(LD_FLAGS) $(LIBS) -o $(NAME).elf
 
 #	$(CXX) -I$(MAVLIB) $(NAME).cpp serial_port.cpp autopilot_interface.cpp -o $(NAME) -lpthread
@@ -58,4 +59,4 @@ graph: $(NAME).bin
 	eog Graphs/$(NAME).svg
 
 clean:
-	 rm -rf *.o $(NAME).elf *.d Graphs/ *.expand
+	 rm -rf *.o $(NAME).elf *.d Graphs/ *.expand *.bin
