@@ -33,6 +33,7 @@ Fixed mavlink library
 - Added initial position acquisation
 - Tested on the ground with both STM32F4 and PC architectures
 - modified the sequences, work as expected
+- Added automatic arm/disarm functions 
 
 ## TODO
 - Reduce timer prescaler
@@ -42,7 +43,10 @@ prescaler)
 - Employ correction algorithms based on external sensor input (work on 
 Sensor_bridge)
 - Add support for other boards
- 
+- Add activation on request for STM32F4 board
+- Move all the execution sequences to seperate files
+- Concatenate all the repetitive commands into functions 
+
 # Requirements
 - STM32F4-discovery (or others might be possible with code modification)
 - ARM development tools : toolchain, st-link
@@ -228,21 +232,18 @@ doing this, or it will NOT react.
 
 Here, you don't need any netcat connection, just plug a serial port connection 
 from Telem 2 (on the pixhawk) to the GPIO Pins on the STM32F4-discovery (after 
-flashing it)
+flashing it) (using a telemetry radio is being worked on, but it's feasable)
 
-Use a FTDI converter to connect to Serial 4 (on the pixhawk), and run this in 
-a terminal:
+Connect the telemetry link to the STM32F4 on ports D8, D9 and GND
+
+
+You can select the sequence to be executed in commands () functions, 
+mavlink_control and flash it :
 ```
-  screen /dev/ttyUSB0 57600 8N1
-  You can use a radio connection with this one.
-```
-and hit enter, you'll see a NuttxShell prompt waiting.
-Tap in: 
-```
-  commander arm
+st-flash erase v2 0x8000000
+make -j4 flash
 ```
 
-You'll see the motors start spining.
 Connect the STM32F4-discovery to power now.
 
 IF correctly configured with a GPS, it will start to fly, if not, you'll have 

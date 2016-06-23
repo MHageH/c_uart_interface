@@ -10,18 +10,13 @@ extern Mavlink_Messages current_messages;
 
 extern char arm_status;
 extern char control_status;
+
 int arm_lock = 0;
 int offboard_control_lock = 0;
-
-// Testing 
-// extern char arm_status;
-// extern char control_status;
-//
 
 int value_mg_x, value_mg_y, value_mg_z;
 
 // Scheduler related
-//int lock_read_messages = 0;
 bool lock_ = false;
 
 int Program_counter = 0; 
@@ -623,7 +618,14 @@ void flight_control_sequence (float timer){
 
 					autopilot_write_helper();
 					enable_offboard_control();
-					autopilot_write();		
+					autopilot_write();	
+
+					if (current_messages.heartbeat.base_mode != OFFBOARD_CONTROL_BASE_MODE){
+						control_status = false;
+						autopilot_write();
+						enable_offboard_control();
+						autopilot_write();
+					}		
 
 					#ifndef STM32F4
 						usleep(100);
