@@ -31,6 +31,8 @@ Fixed mavlink library
 - asynchronous read() mechanism using USART interrupts
 - Recombine general_read_messages () and read_messages()
 - Added initial position acquisation
+- Tested on the ground with both STM32F4 and PC architectures
+- modified the sequences, work as expected
 
 ## TODO
 - Reduce timer prescaler
