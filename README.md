@@ -34,6 +34,9 @@ Fixed mavlink library
 - Tested on the ground with both STM32F4 and PC architectures
 - modified the sequences, work as expected
 - Added automatic arm/disarm functions 
+- Move all the execution sequences to seperate files
+- Concatenate all the repetitive commands into functions 
+
 
 ## TODO
 - Reduce timer prescaler
@@ -44,8 +47,6 @@ prescaler)
 Sensor_bridge)
 - Add support for other boards
 - Add activation on request for STM32F4 board
-- Move all the execution sequences to seperate files
-- Concatenate all the repetitive commands into functions 
 
 # Requirements
 - STM32F4-discovery (or others might be possible with code modification)
@@ -228,27 +229,25 @@ Then compile and execute :
 WARNING : You need to configure the drone correctly with qgroundcontrol before 
 doing this, or it will NOT react.
 
-## STILL BEING WORKED.
+### [Testing footage (with STM32F4 internal accelerometer)](http://sendvid.com/ziebmszp)
 
 Here, you don't need any netcat connection, just plug a serial port connection 
-from Telem 2 (on the pixhawk) to the GPIO Pins on the STM32F4-discovery (after 
-flashing it) (using a telemetry radio is being worked on, but it's feasable)
+from Telem 2 (on the pixhawk) to the GPIO Pins D8, D9 and GND  on the STM32F4-discovery
+(after flashing it) (using a telemetry radio is being worked on, but it's feasable)
 
-Connect the telemetry link to the STM32F4 on ports D8, D9 and GND
+Connect the STM32F4-discovery to power then select the sequence to be executed 
+in commands () functions in mavlink_control.cpp
 
-
-You can select the sequence to be executed in commands () functions, 
-mavlink_control and flash it :
+Flash the program :
 ```
 st-flash erase v2 0x8000000
 make -j4 flash
 ```
+Remove the power cable.
 
-Connect the STM32F4-discovery to power now.
+Connect the telemetry link to the STM32F4 to D8, D9 and GND ports, and reconnect the 
+power cable.
 
-IF correctly configured with a GPS, it will start to fly, if not, you'll have 
-to enter the offboard control mode yourself :
-- commander mode offboard 
 
 # Testing the interface
 
