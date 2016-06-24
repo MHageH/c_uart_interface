@@ -79,34 +79,16 @@ void operation (float timer){
 		value_mg_x = two_compl_to_int16(value_mg_x);
 		// convert X absolute value to mg value 
 		value_mg_x = value_mg_x * SENS_2G_RANGE_MG_PER_DIGIT;
-		/*
-		char x_acc[sizeof(value_mg_x)];
-		send_string("X acceleration value :");
-		send_string(custom_itoa(value_mg_x, x_acc));
-		send_string("\r\n");
-		*/
 
 		// transform Y value from two's complement to 16-bit int 
 		value_mg_y = two_compl_to_int16(value_mg_y);
 		// convert Y absolute value to mg value 
 		value_mg_y = value_mg_y * SENS_2G_RANGE_MG_PER_DIGIT;
-		/*
-		char y_acc[sizeof(value_mg_y)];
-		send_string("Y acceleration value :");
-		send_string(custom_itoa(value_mg_y, y_acc));
-		send_string("\r\n");
-		*/
 
 		// transform Z value from two's complement to 16-bit int 
 		value_mg_z = two_compl_to_int16(value_mg_z);
 		// convert Z absolute value to mg value 
 		value_mg_z = value_mg_z * SENS_2G_RANGE_MG_PER_DIGIT;
-		/*
-		char z_acc[sizeof(value_mg_z)];
-		send_string("Z acceleration value :");
-		send_string(custom_itoa(value_mg_z, z_acc));
-		send_string("\r\n");
-		*/
 
 		#endif
 
@@ -255,34 +237,16 @@ void operation_extended (float timer){
 		value_mg_x = two_compl_to_int16(value_mg_x);
 		// convert X absolute value to mg value 
 		value_mg_x = value_mg_x * SENS_2G_RANGE_MG_PER_DIGIT;
-		/*
-		char x_acc[sizeof(value_mg_x)];
-		send_string("X acceleration value :");
-		send_string(custom_itoa(value_mg_x, x_acc));
-		send_string("\r\n");
-		*/
 
 		// transform Y value from two's complement to 16-bit int 
 		value_mg_y = two_compl_to_int16(value_mg_y);
 		// convert Y absolute value to mg value 
 		value_mg_y = value_mg_y * SENS_2G_RANGE_MG_PER_DIGIT;
-		/*
-		char y_acc[sizeof(value_mg_y)];
-		send_string("Y acceleration value :");
-		send_string(custom_itoa(value_mg_y, y_acc));
-		send_string("\r\n");
-		*/
 
 		// transform Z value from two's complement to 16-bit int 
 		value_mg_z = two_compl_to_int16(value_mg_z);
 		// convert Z absolute value to mg value 
 		value_mg_z = value_mg_z * SENS_2G_RANGE_MG_PER_DIGIT;
-		/*
-		char z_acc[sizeof(value_mg_z)];
-		send_string("Z acceleration value :");
-		send_string(custom_itoa(value_mg_z, z_acc));
-		send_string("\r\n");
-		*/
 
 		#endif
 
