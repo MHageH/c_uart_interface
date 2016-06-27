@@ -2,6 +2,9 @@
 A heavy modification of the original c_uart_interface_example, works on ARM 
 Cortex-M4 STM32F4
 
+### [In Depth](https://www.gitbook.com/book/mhageh/c-uart-interface-technical-details)
+explanation of the functionnality of this interface
+
 The original c_uart_interface_example can be found here (maintained by Lorenz 
 Meier): [mavlink_control](https://github.com/mavlink/c_uart_interface_example)
 
@@ -36,6 +39,7 @@ Fixed mavlink library
 - Added automatic arm/disarm functions 
 - Move all the execution sequences to seperate files
 - Concatenate all the repetitive commands into functions 
+- Added full source code guide
 
 
 ## TODO

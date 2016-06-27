@@ -70,49 +70,62 @@ void operation (float timer){
 
 					#endif 
 
-					set__( - 1.0 + ip.x , ip.y , ip.z - 1, set_point); break;
+					set__(ip.x , ip.y , ip.z - 1, set_point); break;
 			case 3 :
 					#ifdef STM32F4
 						set_yaw (ip.yaw, set_point);
 
-						set__( - 1.0 - (float) (value_mg_y/500) + ip.x , ip.y - (float)(value_mg_x/500), ip.z - 2.0, set_point); break; 
+						set__( - 1.0 + (float) (value_mg_y/500) + ip.x , ip.y + (float)(value_mg_x/500), ip.z - 2.0, set_point); break; 
 					#else 
 						set_yaw (ip.yaw, set_point);
 
-						set__( 1.0 + ip.x , ip.y, ip.z - 2, set_point); break;
+						set__(- 1.0 + ip.x , ip.y, ip.z - 2, set_point); break;
 					#endif
 			case 4 : 
 					#ifndef STM32F4
 					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
 					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
 					
-					// printf("Set point 3\n");
 					#endif
+
+					#ifdef STM32F4
+						set_yaw (ip.yaw, set_point);
+
+						set__( - 1.0 + (float) (value_mg_y/500) + ip.x , ip.y + (float)(value_mg_x/500), ip.z - 1.0, set_point); break;
+
+					#else 
+						set_yaw (ip.yaw, set_point);
+
+						set__(- 1.0 + ip.x , ip.y, ip.z - 2, set_point); break;
+					#endif
+
+			case 5 :
 					set_yaw (ip.yaw, set_point);
 
-					set__( - 1.0 - (float) (value_mg_y/500) + ip.x , ip.y - (float)(value_mg_x/500), ip.z - 1.0, set_point); break;
-			case 5 : 
-					disable_offboard_control_sequence(); 
-					Program_counter = 6;
-					break;
+					set__(- 1.0 + ip.x , ip.y, ip.z - 0.75 , set_point); break;
+
 			case 6 : 
+					disable_offboard_control_sequence(); 
+					Program_counter = 7;
+					break;
+			case 7 : 
 					#ifndef STM32F4
 						printf("Ideling..\n");
 					#else 
 						__asm__("NOP");
 					#endif
 						break;
-						Program_counter = 7;
-			case 7 :
+						Program_counter = 8;
+			case 8 :
 					disarm_sequence();
-					Program_counter = 8;
+					Program_counter = 9;
 					break;
 
 			default : break;
 		}
 		program_counter_sequence(timer);
 
-			if (Program_counter == 8) { Program_counter = 8;}
+			if (Program_counter == 9) { Program_counter = 9;}
 	}
 void operation_extended (float timer){
 	read_messages();
@@ -197,6 +210,7 @@ void square_operation (float timer){
 					offboard_control_sequence(); break;
 			case 2 :
 					set_velocity( - 0.25 , - 0.25 , - 0.25 , set_point);
+					set_yaw (ip.yaw, set_point);
 
 					set__(ip.x ,ip.x , ip.z - 2.0, set_point);
 
@@ -212,12 +226,16 @@ void square_operation (float timer){
 
 					break;
 			case 3 :
+					set_yaw (ip.yaw, set_point);
 					set__(ip.x + 1.0, ip.x, ip.z - 2.0, set_point); break;
 			case 4 :
+					set_yaw (ip.yaw, set_point);
 					set__(ip.x + 1.0, ip.x + 1.0 , ip.z - 2.0, set_point); break;
 			case 5 :
+					set_yaw (ip.yaw, set_point);
 					set__(ip.x  ,ip.x + 1.0 , ip.z  -2.0, set_point); break; 
 			case 6 :
+					set_yaw (ip.yaw, set_point);
 					set__(ip.x ,ip.x  , ip.z  -1.0, set_point); break;
 			case 7 : 
 					#ifndef STM32F4
@@ -251,23 +269,7 @@ void square_operation (float timer){
 			default : break;
 		}
 
-		#ifndef STM32F4
-			end =  time(NULL);
-
-		if ((end - begin) >= timer){
-				begin = time(NULL);
-				printf("Operation : %d \n", Program_counter);
-				Program_counter++;
-			}
-
-		#else 
-			
-		if (seconds >= timer){
-			Program_counter++;
-			seconds = 0;
-		}
-
-		#endif
+		program_counter_sequence(timer);
 
 		if (Program_counter == 10) { Program_counter = 10;}
 	}
@@ -312,8 +314,9 @@ void automatic_takeoff (float timer){
 					offboard_control_sequence(); break;
 			case 2 :
 					#ifndef STM32F4
-					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 1);
+					
+						printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 1);
 
 					#endif
 
@@ -333,23 +336,21 @@ void automatic_takeoff (float timer){
 					set__( ip.x , ip.y , ip.z - 2.00, set_point); break;
 			case 3 : 
 					#ifndef STM32F4
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
-
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
 					#endif
+
 					set_yaw (ip.yaw, set_point);
 					set__( ip.x , ip.y , ip.z - 2.00 , set_point); break;
 			case 4 : 
 					#ifndef STM32F4
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
-
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
 					#endif
 
 					set_yaw (ip.yaw, set_point);
 					set__( ip.x , ip.y , ip.z - 1.00 , set_point); break;
 			case 5 : 
 					#ifndef STM32F4
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
-					
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
 					#endif
 
 					set_yaw (ip.yaw, set_point);
@@ -392,10 +393,8 @@ void flight_control_sequence (float timer){
 					offboard_control_sequence(); break;
 			case 2 :
 					#ifndef STM32F4
-					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 1);
-
-					// printf("Set point 1\n");
+						printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 1);
 					#endif
 
 					set_velocity( - 0.25 , - 0.0 , - 0.50 , set_point);
@@ -413,33 +412,30 @@ void flight_control_sequence (float timer){
 					set__( ip.x , ip.y , ip.z - 2.00, set_point); break;
 			case 3 : 
 					#ifndef STM32F4
-					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
-
+						printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
 					#endif
 					set__( ip.x - 2.00 , ip.y , ip.z -2.00 , set_point); break;
 			case 4 : 
 					#ifndef STM32F4
-					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
-
+						printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
 					#endif
-					set__( ip.x , ip.y , ip.z - 2.00 , set_point); break;
 
+					set__( ip.x , ip.y , ip.z - 2.00 , set_point); break;
 			case 5 : 
 					#ifndef STM32F4
-					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
-					
+						printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);	
 					#endif
 
 					set__( ip.x , ip.y - 2.00 , ip.z - 2.00, set_point); break;
 			case 6 : 
 					#ifndef STM32F4
-					printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
-					printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
-
+						printf("Current Initial position : x = %f , y = %f , z = %f\n", ip.x, ip.y, ip.z);
+						printf("Current set point : x = %f, y = %f z=%f\n", ip.x, ip.y, ip.z - 0.25);
 					#endif
+
 					set__( ip.x , ip.y + 0.00 , ip.z - 2.00 , set_point); break;
 
 			case 7 : 

@@ -6,7 +6,6 @@ char arm_status;
 int system_id;
 int autopilot_id;
 int companion_id;
-bool time_to_exit;
 
 // Current messages and current_setpoint definitions
 Mavlink_Messages current_messages;
@@ -33,7 +32,6 @@ void autopilot_intialize(void){
 
 	control_status = 0;      // whether the autopilot is in offboard control mode
 	arm_status = 0; 		 // whether the autopilot is armed or not
-	time_to_exit   = false;  // flag to signal thread exit
 
 	system_id    = 1; // system id
 	autopilot_id = 1; // autopilot component id
@@ -72,7 +70,7 @@ void read_messages(void){
 	highres_flag = 1; // Highres dependent flag reset timeout
 
 	// Blocking wait for new data
-	while ( !received_all ){ // and !time_to_exit
+	while ( !received_all ){ 
 		// Read one message at a time and complete the current_messages structure
 		mavlink_message_t message;
 
@@ -247,7 +245,6 @@ void autopilot_write_setpoint(void){
 
 	//   WRITE
 	autopilot_write_message(message);
-		//gpio_toggle(GPIOD, GPIO15);	
 	return;
 	}
 void autopilot_write_message(mavlink_message_t message){
