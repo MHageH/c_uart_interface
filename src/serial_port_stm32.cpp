@@ -15,8 +15,6 @@ int b_index = 0;
 
 int mavlink_index = 0; 
 
-char b_tmp[N];
-
 // Initialisation
 void serial_start(void){
     //rcc_clock_setup_hse_3v3(&rcc_hse_8mhz_3v3[RCC_CLOCK_3V3_168MHZ]);
@@ -44,15 +42,11 @@ void serial_start(void){
   	 usart_set_flow_control (USART3, USART_FLOWCONTROL_NONE);
   	 // Enable USART3 Receive interrupt. 
 
-  	 // OLD :: 
-  	 // usart_disable_rx_interrupt (USART3);
-
 	 usart_enable_rx_interrupt (USART3);  	 
 
   	 // Finally enable the USART. 
   	 usart_enable (USART3);
 
-  	 // MOD :: Clock Initialisation
   	 // Enable Timer 2 clock
 	 rcc_periph_clock_enable (RCC_TIM2);
 	 // Enable Timer 2 interrupt
@@ -103,7 +97,7 @@ void usart3_isr(void){
 void tim2_isr (void) { 
 	ticks_sec++;
 	seconds = seconds + 0.25;
-	//gpio_toggle(GPIOD, GPIO12);
+
 	highres_flag = 0;
 
 		if (timer_get_flag(TIM2, TIM_SR_CC1IF)){

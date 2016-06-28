@@ -47,24 +47,14 @@ struct timezone {
 #include <termios.h>
 
 #include <sys/time.h>
-// MOD
 #include <time.h>
-//
 
-#define GPIOA 1
-#define GPIOD 1
-#define GPIO6 1
-#define GPIO12 1
-#define GPIO13 1
-#define GPIO14 1
 #define USART3 3
 
 int init_rs232();
 void free_rs232();
 void sendcmd(int,char*);
-//struct termios oldtio,newtio;
 
-//#define BAUDRATE B4800
 #define BAUDRATE B57600
 
 // Moded for socat bridge
@@ -77,7 +67,6 @@ void sendcmd(int,char*);
 int usart_recv_blocking(int i);
 
 #endif 
-
 
 // Initialisation
 void serial_start(void);

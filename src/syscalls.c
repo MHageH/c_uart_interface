@@ -17,7 +17,6 @@
 
 #include <libopencm3/stm32/usart.h>
 
-// OLD : 	for (i = 0; i < len; i++) {c=usart_recv_blocking(USART1);*p++ = c;}
 
 _ssize_t _read(struct _reent *r, int file, void *ptr, size_t len){
 	char c;
@@ -29,8 +28,6 @@ _ssize_t _read(struct _reent *r, int file, void *ptr, size_t len){
 	//for (i = 0; i < len; i++) {c=usart_recv_blocking(USART3);*p++ = c;} // Since we are using USART3
 	return len - i;
 }
-
-// OLD : for (i = 0; i < len; i++) {usart_send_blocking(USART1, *p++);}
 
  _ssize_t _write ( struct _reent *r, int file, const void *ptr, size_t len){
 	int i;
@@ -121,7 +118,3 @@ int sleep(int usec) {}
 int __dso_handle() {}
 int _open() {}
 
-
-// CAUSE PROBLEMS when handeling MAVLink messages if it's not defined
-
-// int _gettimeofday (){}
