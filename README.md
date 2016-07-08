@@ -3,9 +3,9 @@ A heavy modification of the original c_uart_interface_example, works on ARM
 Cortex-M4 STM32F4
 
 ## Documentation provided
-[In Depth](https://www.gitbook.com/book/mhageh/c-uart-interface-technical-details) explanation of the functionnality of this interface
-This readme serves as a [Usage guide](https://github.com/MHageH/c_uart_interface/blob/master/README.md) 
-The FEMTO-ST internship [report](https://github.com/MHageH/Papers/blob/master/Rapport%20Stage%20L3%20Mohamed%20Hage%20Hassan.pdf) (French)
+[In Depth](https://www.gitbook.com/book/mhageh/c-uart-interface-technical-details) explanation of the functionnality of this interface  
+This readme serves as a [Usage guide](https://github.com/MHageH/c_uart_interface/blob/master/README.md)  
+The FEMTO-ST internship [report](https://github.com/MHageH/Papers/blob/master/Rapport%20Stage%20L3%20Mohamed%20Hage%20Hassan.pdf) (French)  
 
 The original c_uart_interface_example can be found here (maintained by Lorenz 
 Meier): [mavlink_control](https://github.com/mavlink/c_uart_interface_example)
